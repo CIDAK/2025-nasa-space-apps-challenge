@@ -2,7 +2,16 @@
 
 > Purpose: a single-page setup guide for the team — what to install, how to get a minimal C++ and C# project building in VS Code, platform notes and quick troubleshooting.
 
-> https://www.wonda.pro/
+# Create immersive spaces (might be useful for a first-experience with VR)
+Create your own demo space with Wonda Spaces, a browser-based VR creation platform that lets you craft immersive environments without needing advanced technical skills.
+### Multimedia Integration (2D, 3D, 360° Media)
+Add interactive 2D images, video, 3D objects, and 360° media into your immersive space. All these media types are accessible across VR headsets, desktops, tablets, and mobile devices.
+
+### Flexible Templates for Quick Setups
+Jumpstart your project using ready-made templates like 3D rooms (e.g., meeting spaces, art galleries), a 360° virtual tour, or a blank canvas for custom layouts.
+
+> https://spaces.wondavr.com/
+
 ---
 
 ## Project overview
