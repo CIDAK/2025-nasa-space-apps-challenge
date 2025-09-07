@@ -2,6 +2,7 @@
 
 > Purpose: a single-page setup guide for the team — what to install, how to get a minimal C++ and C# project building in VS Code, platform notes and quick troubleshooting.
 
+> https://www.wonda.pro/
 ---
 
 ## Project overview
