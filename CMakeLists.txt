@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.20)
+project(OceanVRExperience)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Set build type if not specified
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Add subdirectories - this will handle the executable creation
+add_subdirectory(src)

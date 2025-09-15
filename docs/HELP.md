@@ -2,6 +2,11 @@
 
 ## Community Resources
 
+
+### Datasets
+
+* **Earth Observation data** Still busy with it
+
 ### OpenXR
 
 * **Khronos.org** - [Empowering Portable Immersive Experiences](https://www.khronos.org/OpenXR/)
