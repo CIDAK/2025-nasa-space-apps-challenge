@@ -1,8 +1,143 @@
-- [ ] Basic Window Creation - GLFW integration working ✅
-- [ ] OpenXR Integration - Basic setup complete ✅
-- [ ] Install Windows Mixed Reality for OpenXR runtime
-- [ ] Full OpenXR VR Session - Head tracking, controllers
-- [ ] NASA Data Loaders - To import Earth observation data
-- [ ] Ocean Rendering Engine - For stunning water visuals
-- [ ] Spatial Audio System - For immersive sound
-- [ ] Interactive Features - User controls and navigation
+# TODO 
+
+Given the hackathon constraints and RADARSAT Constellation Mission (RCM) data focus, I took the role to set this up for us guys. This is a streamlined plan:
+
+## Phase 1: Quick Setup (Hours 1-4)
+- [ ] **Project Foundation**
+  - [ ] Choose WebXR framework (A-Frame recommended for speed, or Three.js + WebXR)
+  - [ ] Set up basic HTML/CSS/JS project structure
+  - [ ] Initialize Git repository
+  - [ ] Test WebXR compatibility on target VR headset and desktop browser
+  - [ ] Set up local development server
+
+- [ ] **Story Concept** (Keep it simple - 2-3 minutes)
+  - [ ] Pick ONE compelling RCM story: 
+    - Option A: Arctic ice monitoring and climate change
+    - Option B: Oil spill detection and ocean pollution
+    - Option C: Coastal erosion and sea level impact
+  - [ ] Write 1-paragraph narrative arc
+  - [ ] Sketch 3-5 key scenes on paper
+
+## Phase 2: Core VR Experience (Hours 5-12)
+- [ ] **WebXR Basic Setup**
+  - [ ] Create basic WebXR scene
+  - [ ] Implement VR session initialization
+  - [ ] Add camera rig (works for both HMD and desktop)
+  - [ ] Test head tracking in VR headset
+  - [ ] Add desktop mouse/keyboard controls as fallback
+  - [ ] Implement simple teleport/movement system
+
+- [ ] **RADARSAT Data Integration**
+  - [ ] Download sample RCM datasets from ASC-CSA portal
+  - [ ] Convert radar imagery to web-friendly formats (PNG/JPG)
+  - [ ] Create simple data parser for metadata
+  - [ ] Load imagery as textures in 3D space
+  - [ ] Display 2-3 key data visualizations (before/after comparisons)
+
+## Phase 3: Ocean Visuals (Hours 13-20)
+- [ ] **Quick Ocean Environment**
+  - [ ] Use pre-built ocean shader (Three.js Water shader or A-Frame ocean component)
+  - [ ] Add simple skybox (free asset or gradient)
+  - [ ] Create floating platform/viewing area for user
+  - [ ] Position RADARSAT data panels in 3D space around user
+  - [ ] Add basic lighting (ambient + directional)
+
+- [ ] **Data Visualization**
+  - [ ] Display radar imagery on floating screens/panels
+  - [ ] Show 2D map overlay with satellite coverage area
+  - [ ] Add simple color coding for data interpretation (ice = blue, oil = red, etc.)
+  - [ ] Include date/time stamps on data panels
+  - [ ] Add simple animations (fade in/out, transitions between datasets)
+
+## Phase 4: Audio & Narration (Hours 21-24)
+- [ ] **Basic Spatial Audio**
+  - [ ] Add ocean ambient sound loop (free from freesound.org)
+  - [ ] Implement Web Audio API for 3D positioning
+  - [ ] Add 2-3 sound effects for scene transitions
+  - [ ] Record quick voice narration (phone recording is fine)
+  - [ ] Sync narration with scene changes
+
+## Phase 5: Interaction & Polish (Hours 25-32)
+- [ ] **Simple Interactivity**
+  - [ ] Add gaze-based selection (raycasting from camera)
+  - [ ] Click/trigger to reveal info panels
+  - [ ] Simple timeline scrubber for temporal data
+  - [ ] "Play" button to start experience
+  - [ ] VR controller support (point and click)
+
+- [ ] **UI Elements**
+  - [ ] Welcome screen with instructions
+  - [ ] Subtitle text for narration
+  - [ ] Simple HUD showing current scene/data
+  - [ ] Credits screen with data attribution
+  - [ ] "Desktop Mode" indicator for non-VR users
+
+## Phase 6: Testing & Final Polish (Hours 33-40)
+- [ ] **Cross-Platform Testing**
+  - [ ] Test in VR headset (Meta Quest browser, etc.)
+  - [ ] Test on desktop Chrome/Firefox
+  - [ ] Fix any major bugs or crashes
+  - [ ] Optimize performance (target 60fps minimum)
+  - [ ] Ensure smooth transitions between scenes
+
+- [ ] **Documentation**
+  - [ ] Write README with setup instructions
+  - [ ] Document RADARSAT data sources
+  - [ ] Create 1-page project description
+  - [ ] Take screenshots/screen recording for demo
+  - [ ] Prepare 2-minute pitch presentation
+
+## MINIMUM VIABLE PRODUCT (MVP) Checklist
+**Must-haves to complete the challenge:**
+- [ ] Works in WebXR (both VR headset AND desktop browser)
+- [ ] Uses RADARSAT RCM data visualizations
+- [ ] 2-3 minute ocean-related story
+- [ ] Basic 3D ocean environment
+- [ ] Simple narration or text explanation
+- [ ] User can navigate/interact with data
+- [ ] Proper data attribution to ASC-CSA
+
+## Recommended Tech Stack (Fastest Path) @Alexsandra-m-silva, @ianthehamster, @DylanPrinsloo
+
+### Option A: A-Frame (Easiest, Fastest)
+```
+- A-Frame 1.4+ (declarative WebXR)
+- A-Frame Environment Component (instant environments)
+- A-Frame Extras (ocean, controls)
+- Howler.js (audio)
+```
+
+### Option B: Three.js (More Control)
+```
+- Three.js + WebXR
+- Three.js Water shader
+- Cannon.js or Ammo.js (physics - optional)
+- Web Audio API
+```
+
+## Quick Asset Resources
+- **Ocean Shaders:** Three.js examples, A-Frame ocean component
+- **Sounds:** freesound.org, BBC Sound Effects
+- **3D Models:** Sketchfab (free), Poly Pizza
+- **Skybox:** HDRI Haven (free HDRIs)
+- **Icons/UI:** Font Awesome, Material Icons
+
+
+## Demo Day Preparation 
+
+- [ ] Host on GitHub Pages or Netlify (free, instant deploy)
+- [ ] Create short demo video (1-2 min)
+- [ ] Prepare elevator pitch (30 seconds)
+- [ ] Have backup plan if WiFi/VR fails (video demo)
+- [ ] Print QR code for easy access to WebXR experience (Important)
+
+
+## Tips from previous entries
+
+1. **Use existing ocean assets** - Don't build from scratch
+2. **Focus on ONE compelling data story** - Don't try to show everything
+3. **Pre-process RADARSAT data** - Have clean images ready to drop in
+4. **Record narration early** - Helps structure the experience
+5. **Test in VR frequently** - Catch issues early
+6. **Keep interactions simple** - Gaze + click is enough
+7. **Use template code** - Start from A-Frame or Three.js examples
