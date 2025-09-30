@@ -16,6 +16,10 @@ How will you creatively blend narration, visuals, and sound to deepen understand
 
 Your project will invite users to step into a virtual journey where NASA's extraordinary Earth data meets storytelling, creating a captivating narrative that educates, engages, and inspires!
 
+Please see [Radarsat Constellation Mission (RCM) Data](https://donnees-data.asc-csa.gc.ca/en/dataset/64927856-8o0t-5u1o-987izna480aa45) Cidak for your data
+
+We should import **RCM1_OK1998432_PK1998435_1_5MCP7_20210708_142323_CH_CV_GRD** and **RCM1_OK1998432_PK1998435_2_5MCP7_20210708_142323_CH_CV_GRD**
+
 ## POTENTIAL CONSIDERATIONS
 
 You may (but are not required to) consider the following:

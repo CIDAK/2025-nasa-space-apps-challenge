@@ -22,6 +22,9 @@
 *.dylib
 *.dll
 
+# Data files (assets/data_raw/RCM1_OK1998432_PK1998435_1_5MCP7_20210708_142323_CH_CV_GRD and assets/data_raw/RCM1_OK1998432_PK1998435_2_5MCP7_20210708_142323_CH_CV_GRD)
+*assets/data_raw
+
 # Fortran module files
 *.mod
 *.smod
