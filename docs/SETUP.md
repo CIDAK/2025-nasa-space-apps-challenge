@@ -1,67 +1,101 @@
-# Project Setup Guide
+# Project Setup Guide (Updated for WebXR / Three.js team)
 
-### Required Software
-1. **Visual Studio Code** - [Download here](https://code.visualstudio.com/)
-2. **Visual Studio Build Tools** (C++ workload) - [Download here](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
-3. **CMake** - [Download here](https://cmake.org/download/)
-4. **.NET SDK** (Latest LTS) - [Download here](https://dotnet.microsoft.com/download)
-5. **Git** - [Download here](https://git-scm.com/downloads)
+This guide helps get your local dev environment running and test the WebXR experience on desktop and VR headsets (Windows / PowerShell).
 
-### OpenXR Runtime
-- **Windows Mixed Reality** - Install "OpenXR Tools for Windows Mixed Reality" from Microsoft Store
+## Required software (minimal)
 
-## Step-by-Step Setup
+- Node.js (LTS) — https://nodejs.org/ (includes npm)
+- Git — https://git-scm.com/
+- Visual Studio Code (recommended)
 
-### Step 1: Clone the Repository
-```bash
-git clone https://github.com/your-repo/2025-nasa-space-apps-challenge.git
-cd 2025-nasa-space-apps-challenge
-```
+Verify stuff is working:
 
-### Step 2: Install VS Code Extensions
-Open VS Code and install these extensions:
-- **C/C++** (Microsoft)
-- **CMake Tools** (Microsoft)
-- **C# Dev Kit** (Microsoft)
-- **GitLens** (GitKraken)
-
-### Step 3: Verify Installations
-Open terminal in VS Code and run:
-```bash
-# Check CMake
-cmake --version
-
-# Check .NET SDK
-dotnet --version
-
-# Check Git
+```powershell
+node -v
+npm -v
 git --version
 ```
 
-### Step 4: Build C++ Project
-```bash
-cd cpp
-mkdir build
-cd build
-cmake ..
-cmake --build .
+## first time setup 
+
+```powershell
+# Open PowerShell in project root
+cd <to where you need to be>
+
+# install dependencies already defined (three, webxr-polyfill, vite, etc.)
+npm install
+
+# if vite is not yet a devDependency:
+npm install --save-dev vite
 ```
 
-### Step 5: Build C# Project
-```bash
-cd csharp
-dotnet restore
-dotnet build
+Add helpful npm scripts (run once):
+
+```powershell
+npm set-script dev "vite"
+npm set-script build "vite build"
+npm set-script preview "vite preview"
 ```
 
-### Step 6: Test OpenXR Runtime
-Run the smoke test:
-```bash
-# From cpp/build directory
-./MyOpenXRApp.exe
+## Run dev server (local)
+
+```powershell
+# start vite (default port 5173)
+npm run dev
+
+# or directly via npx
+npx vite --port 5173
+```
+Open `localhost` in your browser.
+
+## Where to put assets (RADARSAT images) @DylanPrinsloo (Still busy)
+
+<!-- Place preprocessed image frames and other static assets under:
+- project-root/assets/
+Vite serves `/assets/` at the site root (e.g. /assets/data_processed/frames/...) -->
+
+<!-- Example file layout:
+- /index.html
+- /src/main.js
+- /assets/data_processed/frames/video_frame_00000.png -->
+
+## Test on headset (Meta Quest / Android-based browsers) @DylanPrinsloo (Still busy)
+
+<!-- Option A — same Wi‑Fi:
+1. Find your workstation IP:
+```powershell
+ipconfig | Select-String -Pattern "IPv4"
+```
+2. Run vite and bind to host:
+```powershell
+npx vite --host
+# opens on: http://<your-ip>:5173
+```
+3. On headset browser, navigate to http://<your-ip>:5173
+
+Option B — use ngrok (if network blocks direct access):
+```powershell
+# install ngrok and expose port 5173
+ngrok http 5173
+# open the provided https://...ngrok.io URL in headset browser
+``` -->
+
+<!-- Notes:
+- Use HTTPS (ngrok) if required by headset browser for immersive features. -->
+
+## Build & deploy
+
+Build for production:
+```powershell
+npm run build
 ```
 
-You should see: `OpenXR instance created`
+Deploy options:
+
+- GitHub Pages: build output -> branch or use GH Pages workflow (**Ideal**)
+- <span style="color: grey;">Vercel: connect repo and use npm run build as build command (deploys static output)</span>
+
+
 
 
 

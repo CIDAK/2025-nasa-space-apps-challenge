@@ -3,12 +3,12 @@
 Given the hackathon constraints and RADARSAT Constellation Mission (RCM) data focus, I took the role to set this up for us guys. This is a streamlined plan:
 
 ## Phase 1: Quick Setup (Hours 1-4)
-- [ ] **Project Foundation**
-  - [ ] Choose WebXR framework (A-Frame recommended for speed, or Three.js + WebXR)
-  - [ ] Set up basic HTML/CSS/JS project structure
-  - [ ] Initialize Git repository
-  - [ ] Test WebXR compatibility on target VR headset and desktop browser
-  - [ ] Set up local development server
+- [x] **Project Foundation**
+  - [x] Choose WebXR framework (A-Frame recommended for speed, or Three.js + WebXR)
+  - [x] Set up basic HTML/CSS/JS project structure
+  - [x] Initialize Git repository
+  - [x] Test WebXR compatibility on target VR headset and desktop browser
+  - [x] Set up local development server
 
 - [ ] **Story Concept** (Keep it simple - 2-3 minutes)
   - [ ] Pick ONE compelling RCM story: 

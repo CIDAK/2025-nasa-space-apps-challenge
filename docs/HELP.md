@@ -1,20 +1,20 @@
 # Project help
 
-## Community Resources
-
-
 ### Datasets
 
-* **Earth Observation data** Still busy with it
+* **Earth Observation data**  - [Radarsat Constellation Mission (RCM) Data](https://donnees-data.asc-csa.gc.ca/en/dataset/64927856-8o0t-5u1o-987izna480aa45)
+* **Data** - [Index of /users/OpenData_DonneesOuvertes/pub/BC fires](https://donnees-data.asc-csa.gc.ca/users/OpenData_DonneesOuvertes/pub/BC%20fires/)
 
-### OpenXR
+### WEBXR (Used as we dont have a headset to develop with)
 
-* **Khronos.org** - [Empowering Portable Immersive Experiences](https://www.khronos.org/OpenXR/)
-* **Meta.com** - [Wonder. VR](https://www.meta.com/experiences/wonder-vr/9766809893442186/)
+* **webxr** - [webxr-samples](https://github.com/immersive-web/webxr-samples?utm_source=chatgpt.com)
+* **WebXR showcase experiences developed by Meta** - [webxr-showcases](https://github.com/meta-quest/webxr-showcases?utm_source=chatgpt.com)
 
-### Example Projects
-* **OpenXR Samples** - [Microsoft OpenXR Samples](https://github.com/microsoft/OpenXR-MixedReality)
-* **Community Examples** - [Awesome OpenXR](https://github.com/Elameri/awesome-openxr)
+### Example Projects (webxr-showcases)
+
+* **meta-sneaker-builder** - [sneaker-builder](https://meta-quest.github.io/webxr-showcases/sneaker-builder/)
+* **meta-flap-frenzy** - [flap-frenzy](https://meta-quest.github.io/webxr-showcases/flap-frenzy/)
+
 
 ---
 
