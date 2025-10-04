@@ -63,10 +63,7 @@ podaac-data-downloader --version
 3. Create a `.env` file in project root:
 
 ```env
-EARTHDATA_TOKEN=your_token_here
-START_DATE=2020-06-10T11:52:20Z
-END_DATE=2020-06-17T11:52:20Z
-DATA_DIR=./data
+# See .env.example
 ```
 
 ### Download NASA ocean data
