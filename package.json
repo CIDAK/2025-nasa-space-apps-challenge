@@ -1,5 +1,14 @@
 {
+  "name": "2025-nasa-space-apps-challenge",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/main.js"
+  },
   "dependencies": {
+    "axios": "^1.12.2",
+    "dotenv": "^17.2.3",
+    "fs": "^0.0.1-security",
     "three": "^0.180.0",
     "webxr-polyfill": "^2.0.3"
   },
@@ -7,3 +16,4 @@
     "vite": "^7.1.7"
   }
 }
+
