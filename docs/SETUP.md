@@ -28,6 +28,24 @@ cd <to where you need to be>
 # Install Node.js dependencies (three, webxr-polyfill, vite, etc.)
 npm install
 
+# WebXR Setup
+
+- Ensure your browser supports WebXR.
+- For Chrome, enable the WebXR extension:
+  1. Go to `chrome://flags`
+  2. Search for "WebXR"
+  3. Enable relevant WebXR flags
+  4. Restart the browser
+  5. In extensions, find and *install the extension: immersive web emulator*
+
+
+# Install `iwer` - Device Simulator for Orbital Controls
+
+- Install the `iwer` package:
+  ```bash
+  npm install iwer
+  ```
+
 # If vite is not yet a devDependency:
 npm install --save-dev vite
 ```
