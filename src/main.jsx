@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { XRDevice, metaQuest3 } from 'iwer';
+// Add this import at the top of main.jsx
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export default function NASAOceanVR() {
   const containerRef = useRef(null);
@@ -17,11 +19,11 @@ export default function NASAOceanVR() {
     xrDevice.position.set(0, 1.8, 0);
     
     let scene, camera, renderer, controls;
-    let earth, bluePlanet, particles;
+    let earth, aquaSat, particles;
     
     // Scene setup
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000); // Black background
+    scene.background = new THREE.Color(0x181818); // Light black background
     
     // Camera positioned at the center (user position)
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -97,16 +99,50 @@ export default function NASAOceanVR() {
       }
     );
     
-    // ===============================
-    // BLUE PLANET (BEHIND USER)
-    // ===============================
-    const bluePlanetGeometry = new THREE.SphereGeometry(6, 32, 32);
-    const bluePlanetMaterial = new THREE.MeshBasicMaterial({ 
-      color: 0x87CEEB // Light blue color
-    });
-    bluePlanet = new THREE.Mesh(bluePlanetGeometry, bluePlanetMaterial);
-    bluePlanet.position.set(0, 0, 25); // Behind user (positive Z)
-    scene.add(bluePlanet);
+// ===============================
+// ===============================
+// SATELLITE 3D MODEL (BEHIND USER)
+// ===============================
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load(
+    '/assets/3Dmodels/nasa_aqua_eos_pm-1_satellite.glb',
+    (gltf) => {
+      console.log('Satellite model loaded successfully:', gltf);
+      
+      aquaSat = gltf.scene;
+      
+      // Center the model
+      const box = new THREE.Box3().setFromObject(aquaSat);
+      const center = box.getCenter(new THREE.Vector3());
+      aquaSat.position.sub(center); // Center the model
+      
+      // Position behind user
+      aquaSat.position.set(0, 0, 25);
+      
+      // Scale the model (adjust as needed)
+      aquaSat.scale.set(5, 5, 5);
+      
+      // Add lighting for better visibility
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(10, 10, 5);
+      scene.add(directionalLight);
+      
+      scene.add(aquaSat);
+      console.log('Satellite added to scene at position:', aquaSat.position);
+    },
+    (progress) => {
+      console.log('Loading satellite model:', Math.round(progress.loaded / progress.total * 100) + '%');
+    },
+    (error) => {
+      console.error('Error loading satellite model:', error);
+      console.log('Creating fallback blue sphere...');
+      
+      
+    }
+);
     
     // ===============================
     // ANIMATION LOOP
@@ -120,8 +156,8 @@ export default function NASAOceanVR() {
       }
       
       // Rotate blue planet slowly
-      if (bluePlanet) {
-        bluePlanet.rotation.y += 0.002;
+      if (aquaSat) {
+        aquaSat.rotation.y += 0.002;
       }
       
       // Subtle particle movement
@@ -214,7 +250,7 @@ export default function NASAOceanVR() {
         <strong>Space Explorer:</strong><br/>
         🖱️ Mouse: Look around (rotate view)<br/>
         🔄 Mouse wheel: Zoom in/out<br/>
-        🌍 Earth is in front, 🔵 Blue Planet behind
+        🌍 Earth is in front, 🛰️ Satellite is behind you
       </div>
     </div>
   );
