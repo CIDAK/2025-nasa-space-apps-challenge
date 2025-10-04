@@ -11,6 +11,10 @@ export default function NASAOceanVR() {
   const [zoomMode, setZoomMode] = useState(false);
   const [targetObject, setTargetObject] = useState(null);
   
+  // Add refs to track current state for event handlers
+  const zoomModeRef = useRef(false);
+  const targetObjectRef = useRef(null);
+  
   useEffect(() => {
     if (!containerRef.current) return;
     
@@ -23,6 +27,7 @@ export default function NASAOceanVR() {
     let earth, aquaSat, particles;
     let planets = {}; // Store all planets
     let labels = []; // Store all labels
+    let clickableObjects = []; // Store all clickable objects
     
     // Scene setup
     scene = new THREE.Scene();
@@ -30,7 +35,7 @@ export default function NASAOceanVR() {
     
     // Camera positioned at the center (user position)
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 0, 0); // User at center point
+    camera.position.set(0, 1, 150); // User at center point
     
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -53,6 +58,115 @@ export default function NASAOceanVR() {
     controls.update();
     
     // ===============================
+    // RAYCASTER SETUP FOR OBJECT INTERACTIONS
+    // ===============================
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    
+    // Function to add object to clickable objects array
+    function addClickableObject(object) {
+      clickableObjects.push(object);
+      console.log(`Added ${object.userData?.name || 'Unknown'} to clickable objects. Total: ${clickableObjects.length}`);
+    }
+    
+    // Function to handle mouse position calculation
+    function updateMousePosition(event) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      console.log('Mouse position updated:', mouse.x, mouse.y);
+    }
+    
+    // Function to get intersected objects
+    function getIntersectedObjects() {
+      raycaster.setFromCamera(mouse, camera);
+      
+      // Create array of all objects to check (including child meshes)
+      const objectsToCheck = [];
+      
+      clickableObjects.forEach(obj => {
+        if (obj.isMesh) {
+          objectsToCheck.push(obj);
+        } else {
+          // If it's a group (like the satellite), add all child meshes
+          obj.traverse((child) => {
+            if (child.isMesh) {
+              objectsToCheck.push(child);
+            }
+          });
+        }
+      });
+      
+      console.log(`Checking ${objectsToCheck.length} objects for intersection`);
+      const intersects = raycaster.intersectObjects(objectsToCheck, false);
+      console.log(`Found ${intersects.length} intersections`);
+      return intersects;
+    }
+    
+    // Function to handle object clicks
+    function handleObjectClick(intersectedObject) {
+      console.log('handleObjectClick called with:', intersectedObject);
+      
+      // Find the parent object (in case we clicked a child mesh)
+      let targetObj = intersectedObject;
+      
+      // Check if this is a child of a clickable object
+      clickableObjects.forEach(clickableObj => {
+        if (clickableObj.children.includes(intersectedObject) || clickableObj === intersectedObject) {
+          targetObj = clickableObj;
+        }
+      });
+      
+      console.log('Clicked object:', targetObj.userData?.name || 'Unknown');
+      // Add a condition to check THE OBJECT clicked
+      
+      // Custom click handlers for specific objects
+      if (targetObj.userData?.name === 'Sun') {
+        console.log("Sun clicked - DO SOMETHING SPECIAL");
+        // Example: change emission for feedback
+      }
+    }
+    
+    // Mouse hover effects
+    function handleMouseMove(event) {
+      updateMousePosition(event);
+      const intersects = getIntersectedObjects();
+      
+      // Reset cursor
+      document.body.style.cursor = 'default';
+      
+      if (intersects.length > 0) {
+        // Change cursor to pointer when hovering over clickable objects
+        document.body.style.cursor = 'pointer';
+        console.log('Hovering over:', intersects[0].object.userData?.name || 'Unknown object');
+        
+        // Optional: Add hover effects here
+        const hoveredObject = intersects[0].object;
+        // You could add glow effects, scale changes, etc.
+      }
+    }
+    
+    // Click event handler
+    function handleClick(event) {
+      console.log('Click event triggered');
+      console.log('Clickable objects array length:', clickableObjects.length);
+      
+      updateMousePosition(event);
+      const intersects = getIntersectedObjects();
+      
+      if (intersects.length > 0) {
+        console.log('Click intersected with object');
+        handleObjectClick(intersects[0].object);
+      } else {
+        console.log('Click on empty space');
+        // Clicked on empty space - exit zoom mode
+        if (zoomModeRef.current) {
+          zoomOutOfObject();
+        }
+      }
+    }
+    
+    // ===============================
     // LABEL CREATION FUNCTION
     // ===============================
     function createLabel(text, position, color = '#ffffff') {
@@ -60,12 +174,12 @@ export default function NASAOceanVR() {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       
-      // Set canvas size
-      canvas.width = 256;
-      canvas.height = 64;
+      // Set canvas size (larger for better visibility)
+      canvas.width = 512;
+      canvas.height = 128;
       
       // Set font and measure text
-      context.font = 'Bold 24px Arial';
+      context.font = 'Bold 32px Arial';
       context.textAlign = 'center';
       context.textBaseline = 'middle';
       
@@ -73,7 +187,8 @@ export default function NASAOceanVR() {
       context.clearRect(0, 0, canvas.width, canvas.height);
       
       // Draw background rectangle
-      context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      context.fillStyle = 'rgba(0, 0, 0, 0.8)'; // Slightly more opaque background
+      
       context.roundRect = function(x, y, w, h, r) {
         this.beginPath();
         this.moveTo(x + r, y);
@@ -87,7 +202,9 @@ export default function NASAOceanVR() {
         this.quadraticCurveTo(x, y, x + r, y);
         this.closePath();
       };
-      context.roundRect(10, 10, canvas.width - 20, canvas.height - 20, 10);
+      
+      const padding = 15;
+      context.roundRect(padding, padding, canvas.width - padding * 2, canvas.height - padding * 2, 15);
       context.fill();
       
       // Draw text
@@ -102,19 +219,30 @@ export default function NASAOceanVR() {
       const spriteMaterial = new THREE.SpriteMaterial({ 
         map: texture,
         transparent: true,
-        opacity: 0.9
+        opacity: 1.0, // Full opacity
+        depthTest: false, // Don't hide behind objects
+        depthWrite: false // Don't write to depth buffer
       });
       
       // Create sprite
       const sprite = new THREE.Sprite(spriteMaterial);
-      sprite.position.copy(position);
-      sprite.scale.set(8, 2, 1); // Adjust scale as needed
+      
+      // Position label above the object with better offset
+      const labelPosition = position.clone();
+      labelPosition.y += 5; // Higher offset above the object
+      sprite.position.copy(labelPosition);
+      
+      sprite.scale.set(15, 4, 1); // Slightly larger scale for better visibility
       
       // Store reference to original position for updates
       sprite.userData = { 
         originalPosition: position.clone(),
-        text: text
+        text: text,
+        isLabel: true // Mark as label for identification
       };
+      
+      // Render order to ensure labels appear on top
+      sprite.renderOrder = 1000;
       
       scene.add(sprite);
       labels.push(sprite);
@@ -130,10 +258,22 @@ export default function NASAOceanVR() {
         // Make labels always face the camera
         label.lookAt(camera.position);
         
-        // Update position to stay above the object
+        // Update position to stay above the object with dynamic offset
         const originalPos = label.userData.originalPosition;
-        label.position.copy(originalPos);
-        label.position.y += 3; // Offset above the object
+        const newPosition = originalPos.clone();
+        
+        // Calculate distance from camera to adjust label offset
+        const distanceToCamera = camera.position.distanceTo(originalPos);
+        
+        // Dynamic offset based on distance (closer = smaller offset, farther = larger offset)
+        const dynamicOffset = Math.max(3, distanceToCamera * 0.1);
+        newPosition.y += dynamicOffset;
+        
+        label.position.copy(newPosition);
+        
+        // Scale labels based on distance for better readability
+        const baseScale = Math.max(8, distanceToCamera * 0.08);
+        label.scale.set(baseScale, baseScale * 0.25, 1);
       });
     }
     
@@ -145,29 +285,11 @@ export default function NASAOceanVR() {
     let originalMinDistance = 0.1;
     let originalMaxDistance = 200;
 
-    // Function to detect object in front of user
-    function getObjectInFront() {
-      const raycaster = new THREE.Raycaster();
-      const direction = new THREE.Vector3(0, 0, -1); // Forward direction
-      
-      raycaster.set(camera.position, direction);
-      
-      const objectsToCheck = [];
-      if (earth) objectsToCheck.push(earth);
-      if (aquaSat) objectsToCheck.push(aquaSat);
-      Object.values(planets).forEach(planet => objectsToCheck.push(planet));
-      
-      const intersects = raycaster.intersectObjects(objectsToCheck);
-      
-      if (intersects.length > 0) {
-        return intersects[0].object;
-      }
-      return null;
-    }
-
     // Function to zoom into object
     function zoomIntoObject(object) {
-      if (!object || zoomMode) return;
+      if (!object || zoomModeRef.current) return;
+      
+      console.log('Zooming into object:', object.userData?.name || 'Unknown');
       
       // Store original camera settings
       originalCameraPosition.copy(camera.position);
@@ -175,7 +297,11 @@ export default function NASAOceanVR() {
       originalMinDistance = controls.minDistance;
       originalMaxDistance = controls.maxDistance;
       
-      // Set zoom mode
+      // Update refs first
+      zoomModeRef.current = true;
+      targetObjectRef.current = object;
+      
+      // Then update React state for UI
       setZoomMode(true);
       setTargetObject(object);
       
@@ -196,8 +322,15 @@ export default function NASAOceanVR() {
 
     // Function to zoom out of object
     function zoomOutOfObject() {
-      if (!zoomMode) return;
+      if (!zoomModeRef.current) return;
       
+      console.log('Zooming out of object');
+      
+      // Update refs first
+      zoomModeRef.current = false;
+      targetObjectRef.current = null;
+      
+      // Then update React state for UI
       setZoomMode(false);
       setTargetObject(null);
       
@@ -213,7 +346,7 @@ export default function NASAOceanVR() {
       const startMaxDistance = controls.maxDistance;
       
       let progress = 0;
-      const duration = 800; // 1.5 seconds
+      const duration = 800; // 0.8 seconds
       const startTime = Date.now();
       
       function animate() {
@@ -314,7 +447,7 @@ export default function NASAOceanVR() {
     const planetData = [
       { name: 'Mercury', radius: 1.5, position: [35, 0, 0], texture: '/assets/imgs/mercury.jpg' },
       { name: 'Venus', radius: 2.3, position: [-45, 10, 15], texture: '/assets/imgs/venus.jpg' },
-      { name: 'Earth', radius: 2.5, position: [0, 0, 55], texture: '/assets/imgs/ecco2_and_grid_web.png' },
+      { name: 'Earth', radius: 2.5, position: [0, 0, 55], texture: '/assets/imgs/earth.jpg' },
       { name: 'Mars', radius: 2.0, position: [50, -15, -50], texture: '/assets/imgs/mars.jpg' },
       { name: 'Jupiter', radius: 8, position: [-70, 20, -70], texture: '/assets/imgs/jupiter.jpg' },
       { name: 'Saturn', radius: 7, position: [100, -10, 90], texture: '/assets/imgs/saturn.jpg', hasRings: true },
@@ -342,6 +475,9 @@ export default function NASAOceanVR() {
         scene.add(sun);
         planets.Sun = sun;
         
+        // Add to clickable objects
+        addClickableObject(sun);
+        
         // Create label for Sun
         createLabel('☀️ Sun', sun.position, '#FFD700');
       },
@@ -359,6 +495,9 @@ export default function NASAOceanVR() {
         sun.userData = { name: 'Sun', rotationSpeed: 0.001 };
         scene.add(sun);
         planets.Sun = sun;
+        
+        // Add to clickable objects
+        addClickableObject(sun);
         
         // Create label for Sun
         createLabel('☀️ Sun', sun.position, '#FFD700');
@@ -387,7 +526,6 @@ export default function NASAOceanVR() {
         (texture) => {
           const material = new THREE.MeshLambertMaterial({ 
             map: texture
-            // Removed emissive properties to show natural texture colors
           });
           
           const planet = new THREE.Mesh(geometry, material);
@@ -400,16 +538,19 @@ export default function NASAOceanVR() {
           scene.add(planet);
           planets[planetInfo.name] = planet;
           
-          // Create label for planet
-          const color = planetColors[planetInfo.name] || '#ffffff';
-          createLabel(` ${planetInfo.name}`, planet.position, color);
+          // Add to clickable objects
+          addClickableObject(planet);
           
-          // Special handling for Earth and Saturn
+          // Store Earth reference
           if (planetInfo.name === 'Earth') {
             earth = planet;
-            // Load satellite near Earth after Earth is created
+            // Load satellite after Earth is created
             loadSatelliteNearEarth();
           }
+          
+          // Create label for planet
+          const color = planetColors[planetInfo.name] || '#ffffff';
+          createLabel(`🪐 ${planetInfo.name}`, planet.position, color);
           
           // Add rings to Saturn
           if (planetInfo.hasRings && planetInfo.name === 'Saturn') {
@@ -438,7 +579,6 @@ export default function NASAOceanVR() {
                   side: THREE.DoubleSide,
                   transparent: true,
                   opacity: 0.6
-                  // Removed emissive properties
                 });
                 const rings = new THREE.Mesh(ringGeometry, ringMaterial);
                 rings.rotation.x = Math.PI / 2;
@@ -464,7 +604,6 @@ export default function NASAOceanVR() {
           
           const material = new THREE.MeshLambertMaterial({ 
             color: fallbackColors[planetInfo.name] || 0x888888
-            // Removed emissive properties for natural colors
           });
           
           const planet = new THREE.Mesh(geometry, material);
@@ -477,15 +616,18 @@ export default function NASAOceanVR() {
           scene.add(planet);
           planets[planetInfo.name] = planet;
           
-          // Create label for planet
-        
-          const color = planetColors[planetInfo.name] || '#ffffff';
-          createLabel(` ${planetInfo.name}`, planet.position, color);
+          // Add to clickable objects
+          addClickableObject(planet);
           
+          // Store Earth reference
           if (planetInfo.name === 'Earth') {
             earth = planet;
             loadSatelliteNearEarth();
           }
+          
+          // Create label for planet
+          const color = planetColors[planetInfo.name] || '#ffffff';
+          createLabel(`🪐 ${planetInfo.name}`, planet.position, color);
           
           // Add fallback rings to Saturn
           if (planetInfo.hasRings && planetInfo.name === 'Saturn') {
@@ -495,7 +637,6 @@ export default function NASAOceanVR() {
               side: THREE.DoubleSide,
               transparent: true,
               opacity: 0.6
-              // Removed emissive properties
             });
             const rings = new THREE.Mesh(ringGeometry, ringMaterial);
             rings.rotation.x = Math.PI / 2;
@@ -523,12 +664,12 @@ export default function NASAOceanVR() {
               if (child.material) {
                 // Brighter enhancement for satellite
                 child.material.emissive = new THREE.Color(0x333333);
-                child.material.emissiveIntensity = 0.6; // Increased from 0.2
+                child.material.emissiveIntensity = 0.6;
                 child.material.needsUpdate = true;
                 
                 // Higher brightness enhancement
                 if (child.material.color) {
-                  child.material.color.multiplyScalar(2.0); // Increased from 1.3
+                  child.material.color.multiplyScalar(2.0);
                 }
               }
             }
@@ -537,18 +678,17 @@ export default function NASAOceanVR() {
           // Center the model
           const box = new THREE.Box3().setFromObject(aquaSat);
           const center = box.getCenter(new THREE.Vector3());
-          aquaSat.position.sub(center); // Center the model
+          aquaSat.position.sub(center);
           
           // Position near Earth
           if (earth) {
             const earthPos = earth.position.clone();
             aquaSat.position.set(
-              earthPos.x + 8,  // 8 units away from Earth
-              earthPos.y + 3,  // Slightly above
-              earthPos.z + 5   // Slightly forward
+              earthPos.x + 8,
+              earthPos.y + 3,
+              earthPos.z + 5
             );
           } else {
-            // Fallback position if Earth not loaded yet
             aquaSat.position.set(8, 3, 60);
           }
           
@@ -557,10 +697,15 @@ export default function NASAOceanVR() {
           
           aquaSat.userData = { 
             name: 'AquaSat',
-            rotationSpeed: 0.002
+            rotationSpeed: 0.002,
+            isSatellite: true
           };
           
           scene.add(aquaSat);
+          
+          // Add to clickable objects
+          addClickableObject(aquaSat);
+          
           console.log('Satellite added near Earth at position:', aquaSat.position);
           
           // Create label for satellite
@@ -579,8 +724,8 @@ export default function NASAOceanVR() {
           const fallbackGeometry = new THREE.SphereGeometry(1, 16, 16);
           const fallbackMaterial = new THREE.MeshBasicMaterial({ 
             color: 0x00aaff,
-            emissive: 0x0066aa, // Increased emissive
-            emissiveIntensity: 0.8 // Increased from 0.3
+            emissive: 0x0066aa,
+            emissiveIntensity: 0.8
           });
           aquaSat = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
           
@@ -593,10 +738,14 @@ export default function NASAOceanVR() {
           
           aquaSat.userData = { 
             name: 'AquaSat',
-            rotationSpeed: 0.002
+            rotationSpeed: 0.002,
+            isSatellite: true
           };
           
           scene.add(aquaSat);
+          
+          // Add to clickable objects
+          addClickableObject(aquaSat);
           
           // Create label for fallback satellite
           createLabel('🛰️ Aqua Satellite', aquaSat.position, '#00aaff');
@@ -605,71 +754,18 @@ export default function NASAOceanVR() {
         }
       );
     }
-
-    // ===============================
-    // CLICK FUNCTIONALITY
-    // ===============================
-    const handleClick = (event) => {
-      // Calculate mouse position in normalized device coordinates
-      const mouse = new THREE.Vector2();
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    
+    // ADD EVENT LISTENERS AFTER A DELAY TO ENSURE OBJECTS ARE LOADED
+    setTimeout(() => {
+      console.log('Setting up event listeners...');
+      console.log('Current clickable objects count:', clickableObjects.length);
       
-      // Create raycaster
-      const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera(mouse, camera);
+      // Add event listeners
+      renderer.domElement.addEventListener('click', handleClick);
+      renderer.domElement.addEventListener('mousemove', handleMouseMove);
       
-      // Check for intersections
-      const objectsToCheck = [];
-      if (earth) objectsToCheck.push(earth);
-      if (aquaSat) objectsToCheck.push(aquaSat);
-      Object.values(planets).forEach(planet => objectsToCheck.push(planet));
-      
-      const intersects = raycaster.intersectObjects(objectsToCheck);
-      
-      if (intersects.length > 0) {
-        const clickedObject = intersects[0].object;
-        
-        if (!zoomMode) {
-          zoomIntoObject(clickedObject);
-        } else if (targetObject === clickedObject) {
-          zoomOutOfObject();
-        }
-      }
-    };
-
-    renderer.domElement.addEventListener('click', handleClick);
-
-    // ===============================
-    // KEYBOARD CONTROLS
-    // ===============================
-    const handleKeyDown = (event) => {
-      switch (event.code) {
-        case 'KeyZ':
-          if (!zoomMode) {
-            const objectInFront = getObjectInFront();
-            if (objectInFront) {
-              zoomIntoObject(objectInFront);
-            }
-          } else {
-            zoomOutOfObject();
-          }
-          break;
-        case 'Escape':
-          if (zoomMode) {
-            zoomOutOfObject();
-          }
-          break;
-        case 'KeyL':
-          // Toggle labels visibility
-          labels.forEach(label => {
-            label.visible = !label.visible;
-          });
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
+      console.log('Event listeners added!');
+    }, 2000); // Wait 2 seconds for objects to load
     
     // ===============================
     // ANIMATION LOOP
@@ -727,14 +823,16 @@ export default function NASAOceanVR() {
     // ===============================
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('keydown', handleKeyDown);
       renderer.domElement.removeEventListener('click', handleClick);
+      renderer.domElement.removeEventListener('mousemove', handleMouseMove);
+      document.body.style.cursor = 'default'; // Reset cursor
       if (containerRef.current && renderer.domElement) {
         containerRef.current.removeChild(renderer.domElement);
       }
       renderer.dispose();
     };
   }, []);
+  
   
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
@@ -790,11 +888,9 @@ export default function NASAOceanVR() {
         🖱️ Mouse: Look around (rotate view)<br/>
         🔄 Mouse wheel: Zoom in/out<br/>
         🖱️ Click: Zoom into planets/objects<br/>
-        ⌨️ Z: Zoom into object in front<br/>
-        ⌨️ L: Toggle labels on/off<br/>
-        ⌨️ Esc: Exit zoom mode<br/>
+        💫 Hover: Objects glow when selectable<br/>
         {zoomMode ? 
-          '🔍 In zoom mode - click object or press Esc to exit' : 
+          '🔍 In zoom mode - click object again to exit or click empty space' : 
           '☀️ Bright Sun at center, 🪐 Textured planets, 🛰️ Satellite near Earth, ✨ Colorful distant stars'
         }
       </div>
@@ -811,10 +907,10 @@ export default function NASAOceanVR() {
         fontSize: '12px',
         maxWidth: '250px'
       }}>
-        <strong>Objects with Labels:</strong><br/>
-         Sun (center) |  Mercury |  Venus |  Earth + Aqua satellite<br/>
-         Mars |  Jupiter |  Saturn + Rings |  Uranus |  Neptune<br/>
-        Colorful stars in far background<br/>
+        <strong>Clickable Objects:</strong><br/>
+        ☀️ Sun (center) | 🪐 Mercury | 🪐 Venus | 🌍 Earth + Aqua satellite<br/>
+        🪐 Mars | 🪐 Jupiter | 🪐 Saturn + Rings | 🪐 Uranus | 🪐 Neptune<br/>
+        Click any object to zoom in and explore!
       </div>
     </div>
   );
