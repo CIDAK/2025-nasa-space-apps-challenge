@@ -4,7 +4,6 @@ from datetime import datetime
 from pathlib import Path
 
 def download_nasa_ocean_data(start_date, end_date, output_dir='./data'):
-    """Download ocean data from NASA CMR API"""
     
     # CMR API endpoint
     base_url = "https://cmr.earthdata.nasa.gov/search/granules.json"

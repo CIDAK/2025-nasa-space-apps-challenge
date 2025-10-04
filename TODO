@@ -2,27 +2,6 @@
 
 Task for cidak developers: add @github-handle after tasks.
 
-
-## <span style="color: green;">Phase 1 Foundation</span> @DylanPrinsloo
-- [x] index.html at project root, entry: /src/main.js
-- [x] Vite dev server configured (use npx vite or npm run dev)
-- [x] Dependencies: three, webxr-polyfill, vite
-- [x] Basic Three.js scene scaffold (VRButton, renderer.xr enabled) 
-- [x] Add README.md and docs/SETUP.md with headset instructions @docs
-
-- [ ] **Story Concept** (Keep it simple - 2-3 minutes) 
-  - [ ] Pick ONE compelling RCM story: 
-      - [ ] Maritime surveillance (ice, surface wind, oil pollution and ship monitoring) 
-      - [ ] Disaster management (mitigation, warning, response and recovery)
-      - [ ]Ecosystem monitoring (agriculture, wetlands, forestry and coastal change monitoring)
-        - Add ons:
-          - [ ] Option 1: Distance the sat is at, and what it picks up. Use realworld objects to show this distance
-          - [ ] Option: Oil spill detection and ocean pollution (Could we do realtime?)
-    - 
-  - [ ] Write 1-paragraph narrative arc
-  - [ ] Sketch 3-5 key scenes
-
-
 ## <span style="color: blue;">Phase 2 Data + Scene</span> 
 
 - [ ] Load preprocessed RADARSAT frames from /assets/data_processed/frames/ -> @ianthehamster and @DylanPrinsloo
