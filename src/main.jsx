@@ -132,6 +132,12 @@ export default function NASAOceanVR() {
       
       scene.add(aquaSat);
       console.log('Satellite added to scene at position:', aquaSat.position);
+    // Add button above
+      const buttonGeometry = new THREE.BoxGeometry(12, 4, 2);
+      const buttonMaterial = new THREE.MeshBasicMaterial({ color: 0x0077ff });
+      const button = new THREE.Mesh(buttonGeometry, buttonMaterial);
+      button.position.set(aquaSat.position.x, aquaSat.position.y + 5, aquaSat.position.z); // Position above the satellite
+      scene.add(button);
     },
     (progress) => {
       console.log('Loading satellite model:', Math.round(progress.loaded / progress.total * 100) + '%');
