@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { XRDevice, metaQuest3 } from 'iwer';
+
 
 export default function NASAOceanVR() {
   const containerRef = useRef(null);
@@ -11,6 +13,13 @@ export default function NASAOceanVR() {
   
   useEffect(() => {
     if (!containerRef.current) return;
+
+    // Emulate Meta Quest 3 device
+    const xrDevice = new XRDevice(metaQuest3);
+    xrDevice.installRuntime();
+
+    // Set the xrDevice's position
+    xrDevice.position.set(0, 1.8, 0);
     
     let scene, camera, renderer, oceanMesh, infoPanel;
     let oceanFrames = [];
@@ -321,12 +330,12 @@ export default function NASAOceanVR() {
     vrButton.style.cursor = 'pointer';
     vrButton.style.zIndex = '1000';
     
-    vrButton.onclick = async () => {
+    /*vrButton.onclick = async () => {
       if (navigator.xr) {
         const session = await navigator.xr.requestSession('immersive-vr');
         renderer.xr.setSession(session);
       }
-    };
+    };*/
     
     // Check VR support
     if (navigator.xr) {
