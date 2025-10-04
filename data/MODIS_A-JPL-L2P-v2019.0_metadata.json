@@ -1,0 +1,1691 @@
+[
+  {
+    "time_start": "2020-06-10T11:50:01.000Z",
+    "updated": "2020-12-03T05:30:27.047Z",
+    "dataset_id": "GHRSST Level 2P Global Sea Surface Skin Temperature from the Moderate Resolution Imaging Spectroradiometer (MODIS) on the NASA Aqua satellite (GDS2)",
+    "data_center": "POCLOUD",
+    "title": "20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0",
+    "coordinate_system": "CARTESIAN",
+    "day_night_flag": "UNSPECIFIED",
+    "time_end": "2020-06-10T11:55:00.000Z",
+    "id": "G1966475834-POCLOUD",
+    "original_format": "UMM_JSON",
+    "granule_size": "26.548780441284176",
+    "browse_flag": true,
+    "polygons": [
+      [
+        "9.70365 -162.87967 -8.18213 -166.75516 -11.24787 -145.66301 6.66514 -141.97626 9.70365 -162.87967"
+      ]
+    ],
+    "collection_concept_id": "C1940473819-POCLOUD",
+    "online_access_flag": true,
+    "links": [
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/s3#",
+        "title": "This link provides direct download access via S3 to the granule.",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "Download 20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "OPeNDAP request URL",
+        "hreflang": "en-US",
+        "href": "https://opendap.earthdata.nasa.gov/providers/POCLOUD/collections/GHRSST%20Level%202P%20Global%20Sea%20Surface%20Skin%20Temperature%20from%20the%20Moderate%20Resolution%20Imaging%20Spectroradiometer%20(MODIS)%20on%20the%20NASA%20Aqua%20satellite%20(GDS2)/granules/20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sea_surface_temperature.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.quality_level.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_bias.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_standard_deviation.png"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/data-readers"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/ghrsst/open/docs/GDS20r5.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://ghrsst.jpl.nasa.gov"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/flag/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/reprocessing/r2019/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst4/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://modis.gsfc.nasa.gov/data/atbd/atbd_mod25.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "http://www.ghrsst.org"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/forum/viewforum.php?f=18&sid=e2d67e5a01815fc6e39fcd2087ed8bc8"
+      },
+      {
+        "inherited": true,
+        "length": "75.0MB",
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1940473819-POCLOUD"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/tutorials/blob/master/notebooks/MODIS_L2P_SST_DataCube.ipynb"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://search.earthdata.nasa.gov/search/granules?p=C1940473819-POCLOUD"
+      }
+    ]
+  },
+  {
+    "time_start": "2020-06-10T11:55:01.000Z",
+    "updated": "2023-04-06T07:21:20.146Z",
+    "dataset_id": "GHRSST Level 2P Global Sea Surface Skin Temperature from the Moderate Resolution Imaging Spectroradiometer (MODIS) on the NASA Aqua satellite (GDS2)",
+    "data_center": "POCLOUD",
+    "title": "20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0",
+    "coordinate_system": "CARTESIAN",
+    "day_night_flag": "UNSPECIFIED",
+    "time_end": "2020-06-10T11:59:58.000Z",
+    "id": "G1966699027-POCLOUD",
+    "original_format": "UMM_JSON",
+    "granule_size": "9.34600830078125E-5",
+    "browse_flag": true,
+    "polygons": [
+      [
+        "-8.10596 -166.74991 -25.63976 -172.02481 -29.0613 -148.42575 -11.17197 -145.66298 -8.10596 -166.74991"
+      ]
+    ],
+    "collection_concept_id": "C1940473819-POCLOUD",
+    "online_access_flag": true,
+    "links": [
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "This link provides direct download access via S3 to the granule",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "Download 20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/s3#",
+        "title": "This link provides direct download access via S3 to the granule",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/service#",
+        "title": "OPeNDAP request URL",
+        "hreflang": "en-US",
+        "href": "https://opendap.earthdata.nasa.gov/collections/C1940473819-POCLOUD/granules/20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sea_surface_temperature.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.quality_level.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_bias.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610115501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_standard_deviation.png"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/data-readers"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/ghrsst/open/docs/GDS20r5.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://ghrsst.jpl.nasa.gov"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/flag/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/reprocessing/r2019/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst4/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://modis.gsfc.nasa.gov/data/atbd/atbd_mod25.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "http://www.ghrsst.org"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/forum/viewforum.php?f=18&sid=e2d67e5a01815fc6e39fcd2087ed8bc8"
+      },
+      {
+        "inherited": true,
+        "length": "75.0MB",
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1940473819-POCLOUD"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/tutorials/blob/master/notebooks/MODIS_L2P_SST_DataCube.ipynb"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://search.earthdata.nasa.gov/search/granules?p=C1940473819-POCLOUD"
+      }
+    ]
+  },
+  {
+    "time_start": "2020-06-10T12:00:01.000Z",
+    "updated": "2020-12-03T05:08:34.211Z",
+    "dataset_id": "GHRSST Level 2P Global Sea Surface Skin Temperature from the Moderate Resolution Imaging Spectroradiometer (MODIS) on the NASA Aqua satellite (GDS2)",
+    "data_center": "POCLOUD",
+    "title": "20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0",
+    "coordinate_system": "CARTESIAN",
+    "day_night_flag": "UNSPECIFIED",
+    "time_end": "2020-06-10T12:04:59.000Z",
+    "id": "G1966470379-POCLOUD",
+    "original_format": "UMM_JSON",
+    "granule_size": "25.68050956726074",
+    "browse_flag": true,
+    "polygons": [
+      [
+        "-42.4677 180 -42.7076 179.8525 -42.7482 180 -42.4677 180"
+      ],
+      [
+        "-25.6511 -172.041 -29.8918 -173.6706 -34.1062 -175.5078 -38.4385 -177.6684 -42.442 -179.9885 -42.7482 -180 -44.5349 -172.8633 -45.8603 -165.4129 -46.6889 -157.8946 -47.0195 -150.3187 -38.6749 -149.5851 -29.0729 -148.4389 -28.6412 -154.4015 -27.9431 -160.2097 -26.9464 -166.0816 -25.6511 -172.041"
+      ]
+    ],
+    "collection_concept_id": "C1940473819-POCLOUD",
+    "online_access_flag": true,
+    "links": [
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/s3#",
+        "title": "This link provides direct download access via S3 to the granule.",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "Download 20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "OPeNDAP request URL",
+        "hreflang": "en-US",
+        "href": "https://opendap.earthdata.nasa.gov/providers/POCLOUD/collections/GHRSST%20Level%202P%20Global%20Sea%20Surface%20Skin%20Temperature%20from%20the%20Moderate%20Resolution%20Imaging%20Spectroradiometer%20(MODIS)%20on%20the%20NASA%20Aqua%20satellite%20(GDS2)/granules/20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sea_surface_temperature.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.quality_level.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_bias.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_standard_deviation.png"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/data-readers"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/ghrsst/open/docs/GDS20r5.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://ghrsst.jpl.nasa.gov"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/flag/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/reprocessing/r2019/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst4/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://modis.gsfc.nasa.gov/data/atbd/atbd_mod25.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "http://www.ghrsst.org"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/forum/viewforum.php?f=18&sid=e2d67e5a01815fc6e39fcd2087ed8bc8"
+      },
+      {
+        "inherited": true,
+        "length": "75.0MB",
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1940473819-POCLOUD"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/tutorials/blob/master/notebooks/MODIS_L2P_SST_DataCube.ipynb"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://search.earthdata.nasa.gov/search/granules?p=C1940473819-POCLOUD"
+      }
+    ]
+  },
+  {
+    "time_start": "2020-06-10T12:05:01.000Z",
+    "updated": "2020-12-03T11:28:27.606Z",
+    "dataset_id": "GHRSST Level 2P Global Sea Surface Skin Temperature from the Moderate Resolution Imaging Spectroradiometer (MODIS) on the NASA Aqua satellite (GDS2)",
+    "data_center": "POCLOUD",
+    "title": "20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0",
+    "coordinate_system": "CARTESIAN",
+    "day_night_flag": "UNSPECIFIED",
+    "time_end": "2020-06-10T12:09:59.000Z",
+    "id": "G1966653934-POCLOUD",
+    "original_format": "UMM_JSON",
+    "granule_size": "25.701332092285156",
+    "browse_flag": true,
+    "polygons": [
+      [
+        "-42.63265 179.88451 -51.44854 173.12686 -58.34828 164.9975 -62.49785 180 -42.63265 179.88451"
+      ],
+      [
+        "-42.66608 -180 -62.49785 -180 -64.40996 -165.64227 -64.79534 -150.45537 -46.93997 -150.32806 -45.85299 -165.51204 -42.66608 -180"
+      ]
+    ],
+    "collection_concept_id": "C1940473819-POCLOUD",
+    "online_access_flag": true,
+    "links": [
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/s3#",
+        "title": "This link provides direct download access via S3 to the granule.",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "Download 20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "OPeNDAP request URL",
+        "hreflang": "en-US",
+        "href": "https://opendap.earthdata.nasa.gov/providers/POCLOUD/collections/GHRSST%20Level%202P%20Global%20Sea%20Surface%20Skin%20Temperature%20from%20the%20Moderate%20Resolution%20Imaging%20Spectroradiometer%20(MODIS)%20on%20the%20NASA%20Aqua%20satellite%20(GDS2)/granules/20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sea_surface_temperature.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.quality_level.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_bias.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610120501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_standard_deviation.png"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/data-readers"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/ghrsst/open/docs/GDS20r5.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://ghrsst.jpl.nasa.gov"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/flag/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/reprocessing/r2019/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst4/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://modis.gsfc.nasa.gov/data/atbd/atbd_mod25.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "http://www.ghrsst.org"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/forum/viewforum.php?f=18&sid=e2d67e5a01815fc6e39fcd2087ed8bc8"
+      },
+      {
+        "inherited": true,
+        "length": "75.0MB",
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1940473819-POCLOUD"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/tutorials/blob/master/notebooks/MODIS_L2P_SST_DataCube.ipynb"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://search.earthdata.nasa.gov/search/granules?p=C1940473819-POCLOUD"
+      }
+    ]
+  },
+  {
+    "time_start": "2020-06-10T12:10:01.000Z",
+    "updated": "2020-12-03T07:54:16.618Z",
+    "dataset_id": "GHRSST Level 2P Global Sea Surface Skin Temperature from the Moderate Resolution Imaging Spectroradiometer (MODIS) on the NASA Aqua satellite (GDS2)",
+    "data_center": "POCLOUD",
+    "title": "20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0",
+    "coordinate_system": "CARTESIAN",
+    "day_night_flag": "UNSPECIFIED",
+    "time_end": "2020-06-10T12:14:59.000Z",
+    "id": "G1966464466-POCLOUD",
+    "original_format": "UMM_JSON",
+    "granule_size": "22.371565818786618",
+    "browse_flag": true,
+    "polygons": [
+      [
+        "-69.64228 131.50917 -74.58399 139.1291 -78.15469 149.22162 -80.62368 162.56136 -82.14261 180 -62.49852 180 -58.28575 165.08244 -62.21211 158.27945 -65.35872 150.52341 -69.64228 131.50917"
+      ],
+      [
+        "-62.49852 -180 -82.14261 -180 -82.23404 -138.71242 -79.48634 -143.84795 -76.41689 -146.82111 -71.58372 -149.1624 -64.71543 -150.47084 -64.39059 -165.73883 -62.49852 -180"
+      ]
+    ],
+    "collection_concept_id": "C1940473819-POCLOUD",
+    "online_access_flag": true,
+    "links": [
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/s3#",
+        "title": "This link provides direct download access via S3 to the granule.",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "Download 20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "OPeNDAP request URL",
+        "hreflang": "en-US",
+        "href": "https://opendap.earthdata.nasa.gov/providers/POCLOUD/collections/GHRSST%20Level%202P%20Global%20Sea%20Surface%20Skin%20Temperature%20from%20the%20Moderate%20Resolution%20Imaging%20Spectroradiometer%20(MODIS)%20on%20the%20NASA%20Aqua%20satellite%20(GDS2)/granules/20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sea_surface_temperature.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.quality_level.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_bias.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121001-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_standard_deviation.png"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/data-readers"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/ghrsst/open/docs/GDS20r5.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://ghrsst.jpl.nasa.gov"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/flag/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/reprocessing/r2019/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst4/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://modis.gsfc.nasa.gov/data/atbd/atbd_mod25.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "http://www.ghrsst.org"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/forum/viewforum.php?f=18&sid=e2d67e5a01815fc6e39fcd2087ed8bc8"
+      },
+      {
+        "inherited": true,
+        "length": "75.0MB",
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1940473819-POCLOUD"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/tutorials/blob/master/notebooks/MODIS_L2P_SST_DataCube.ipynb"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://search.earthdata.nasa.gov/search/granules?p=C1940473819-POCLOUD"
+      }
+    ]
+  },
+  {
+    "time_start": "2020-06-10T12:15:01.000Z",
+    "updated": "2020-12-03T07:48:47.113Z",
+    "dataset_id": "GHRSST Level 2P Global Sea Surface Skin Temperature from the Moderate Resolution Imaging Spectroradiometer (MODIS) on the NASA Aqua satellite (GDS2)",
+    "data_center": "POCLOUD",
+    "title": "20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0",
+    "coordinate_system": "CARTESIAN",
+    "day_night_flag": "UNSPECIFIED",
+    "time_end": "2020-06-10T12:19:59.000Z",
+    "id": "G1966491735-POCLOUD",
+    "original_format": "UMM_JSON",
+    "granule_size": "16.74172782897949",
+    "browse_flag": true,
+    "polygons": [
+      [
+        "-90 -180 -90 -90 -90 0 -90 90 -90 180 -82.1147 180 -80.62214 162.5573 -78.1565 149.20013 -74.58714 139.22623 -69.61057 131.71968 -70.78733 118.84997 -70.96415 104.94601 -70.13423 91.86227 -68.2485 79.65311 -73.38536 69.02702 -76.85938 54.90894 -79.17394 31.39186 -79.16635 3.84292 -81.84846 -0.712 -83.79456 -6.79266 -86.274 -27.164 -87.272 -61.694 -86.804 -102.394 -85.20945 -125.34903 -82.15782 -138.94408 -82.1147 -180 -90 -180"
+      ]
+    ],
+    "collection_concept_id": "C1940473819-POCLOUD",
+    "online_access_flag": true,
+    "links": [
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/s3#",
+        "title": "This link provides direct download access via S3 to the granule.",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "Download 20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "OPeNDAP request URL",
+        "hreflang": "en-US",
+        "href": "https://opendap.earthdata.nasa.gov/providers/POCLOUD/collections/GHRSST%20Level%202P%20Global%20Sea%20Surface%20Skin%20Temperature%20from%20the%20Moderate%20Resolution%20Imaging%20Spectroradiometer%20(MODIS)%20on%20the%20NASA%20Aqua%20satellite%20(GDS2)/granules/20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sea_surface_temperature.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.quality_level.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_bias.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610121501-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_standard_deviation.png"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/data-readers"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/ghrsst/open/docs/GDS20r5.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://ghrsst.jpl.nasa.gov"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/flag/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/reprocessing/r2019/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst4/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://modis.gsfc.nasa.gov/data/atbd/atbd_mod25.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "http://www.ghrsst.org"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/forum/viewforum.php?f=18&sid=e2d67e5a01815fc6e39fcd2087ed8bc8"
+      },
+      {
+        "inherited": true,
+        "length": "75.0MB",
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1940473819-POCLOUD"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/tutorials/blob/master/notebooks/MODIS_L2P_SST_DataCube.ipynb"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://search.earthdata.nasa.gov/search/granules?p=C1940473819-POCLOUD"
+      }
+    ]
+  },
+  {
+    "time_start": "2020-06-10T12:20:00.000Z",
+    "updated": "2020-12-03T01:50:38.123Z",
+    "dataset_id": "GHRSST Level 2P Global Sea Surface Skin Temperature from the Moderate Resolution Imaging Spectroradiometer (MODIS) on the NASA Aqua satellite (GDS2)",
+    "data_center": "POCLOUD",
+    "title": "20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0",
+    "coordinate_system": "CARTESIAN",
+    "day_night_flag": "UNSPECIFIED",
+    "time_end": "2020-06-10T12:24:59.000Z",
+    "id": "G1966592671-POCLOUD",
+    "original_format": "UMM_JSON",
+    "granule_size": "21.426208496093746",
+    "browse_flag": true,
+    "polygons": [
+      [
+        "-68.2925 79.82537 -63.26576 63.30132 -59.8582 56.64644 -55.72902 50.77345 -58.4599 41.68851 -60.35695 31.80055 -61.57593 10.04817 -72.98537 8.23304 -76.43475 6.41165 -79.24357 3.72581 -79.29809 29.05967 -77.3959 51.4214 -73.80766 67.81525 -68.2925 79.82537"
+      ]
+    ],
+    "collection_concept_id": "C1940473819-POCLOUD",
+    "online_access_flag": true,
+    "links": [
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/s3#",
+        "title": "This link provides direct download access via S3 to the granule.",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "Download 20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "OPeNDAP request URL",
+        "hreflang": "en-US",
+        "href": "https://opendap.earthdata.nasa.gov/providers/POCLOUD/collections/GHRSST%20Level%202P%20Global%20Sea%20Surface%20Skin%20Temperature%20from%20the%20Moderate%20Resolution%20Imaging%20Spectroradiometer%20(MODIS)%20on%20the%20NASA%20Aqua%20satellite%20(GDS2)/granules/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sea_surface_temperature.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.quality_level.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_bias.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_standard_deviation.png"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/data-readers"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/ghrsst/open/docs/GDS20r5.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://ghrsst.jpl.nasa.gov"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/flag/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/reprocessing/r2019/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst4/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://modis.gsfc.nasa.gov/data/atbd/atbd_mod25.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "http://www.ghrsst.org"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/forum/viewforum.php?f=18&sid=e2d67e5a01815fc6e39fcd2087ed8bc8"
+      },
+      {
+        "inherited": true,
+        "length": "75.0MB",
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1940473819-POCLOUD"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/tutorials/blob/master/notebooks/MODIS_L2P_SST_DataCube.ipynb"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://search.earthdata.nasa.gov/search/granules?p=C1940473819-POCLOUD"
+      }
+    ]
+  },
+  {
+    "time_start": "2020-06-10T12:20:00.000Z",
+    "updated": "2020-12-03T10:53:27.934Z",
+    "dataset_id": "GHRSST Level 2P Global Sea Surface Skin Temperature from the Moderate Resolution Imaging Spectroradiometer (MODIS) on the NASA Aqua satellite (GDS2)",
+    "data_center": "POCLOUD",
+    "title": "20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0",
+    "coordinate_system": "CARTESIAN",
+    "day_night_flag": "UNSPECIFIED",
+    "time_end": "2020-06-10T12:24:59.000Z",
+    "id": "G1966787151-POCLOUD",
+    "original_format": "UMM_JSON",
+    "granule_size": "19.07487106323242",
+    "browse_flag": true,
+    "polygons": [
+      [
+        "-68.2925 79.82537 -63.26576 63.30132 -59.8582 56.64644 -55.72902 50.77345 -58.4599 41.68851 -60.35695 31.80055 -61.57593 10.04817 -72.98537 8.23304 -76.43475 6.41165 -79.24357 3.72581 -79.29809 29.05967 -77.3959 51.4214 -73.80766 67.81525 -68.2925 79.82537"
+      ]
+    ],
+    "collection_concept_id": "C1940473819-POCLOUD",
+    "online_access_flag": true,
+    "links": [
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/s3#",
+        "title": "This link provides direct download access via S3 to the granule.",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc.md5",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "Download 20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.cmr.json",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.cmr.json"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "OPeNDAP request URL",
+        "hreflang": "en-US",
+        "href": "https://opendap.earthdata.nasa.gov/providers/POCLOUD/collections/GHRSST%20Level%202P%20Global%20Sea%20Surface%20Skin%20Temperature%20from%20the%20Moderate%20Resolution%20Imaging%20Spectroradiometer%20(MODIS)%20on%20the%20NASA%20Aqua%20satellite%20(GDS2)/granules/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.sea_surface_temperature.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.quality_level.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.sses_bias.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122000-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.sses_standard_deviation.png"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/data-readers"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/ghrsst/open/docs/GDS20r5.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://ghrsst.jpl.nasa.gov"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/flag/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/reprocessing/r2019/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst4/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://modis.gsfc.nasa.gov/data/atbd/atbd_mod25.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "http://www.ghrsst.org"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/forum/viewforum.php?f=18&sid=e2d67e5a01815fc6e39fcd2087ed8bc8"
+      },
+      {
+        "inherited": true,
+        "length": "75.0MB",
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1940473819-POCLOUD"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/tutorials/blob/master/notebooks/MODIS_L2P_SST_DataCube.ipynb"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://search.earthdata.nasa.gov/search/granules?p=C1940473819-POCLOUD"
+      }
+    ]
+  },
+  {
+    "time_start": "2020-06-10T12:25:00.000Z",
+    "updated": "2020-12-03T10:35:35.309Z",
+    "dataset_id": "GHRSST Level 2P Global Sea Surface Skin Temperature from the Moderate Resolution Imaging Spectroradiometer (MODIS) on the NASA Aqua satellite (GDS2)",
+    "data_center": "POCLOUD",
+    "title": "20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0",
+    "coordinate_system": "CARTESIAN",
+    "day_night_flag": "UNSPECIFIED",
+    "time_end": "2020-06-10T12:29:59.000Z",
+    "id": "G1966657944-POCLOUD",
+    "original_format": "UMM_JSON",
+    "granule_size": "21.51909351348877",
+    "browse_flag": true,
+    "polygons": [
+      [
+        "-55.7963 50.84799 -48.68772 43.7224 -39.73191 37.67358 -42.67619 23.93465 -43.77265 9.43189 -61.65661 10.03802 -60.35685 31.75646 -55.7963 50.84799"
+      ]
+    ],
+    "collection_concept_id": "C1940473819-POCLOUD",
+    "online_access_flag": true,
+    "links": [
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/s3#",
+        "title": "This link provides direct download access via S3 to the granule.",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "Download 20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc.md5",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.cmr.json",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.cmr.json"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "OPeNDAP request URL",
+        "hreflang": "en-US",
+        "href": "https://opendap.earthdata.nasa.gov/providers/POCLOUD/collections/GHRSST%20Level%202P%20Global%20Sea%20Surface%20Skin%20Temperature%20from%20the%20Moderate%20Resolution%20Imaging%20Spectroradiometer%20(MODIS)%20on%20the%20NASA%20Aqua%20satellite%20(GDS2)/granules/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.sea_surface_temperature.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.quality_level.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.sses_bias.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-D-v02.0-fv01.0.sses_standard_deviation.png"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/data-readers"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/ghrsst/open/docs/GDS20r5.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://ghrsst.jpl.nasa.gov"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/flag/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/reprocessing/r2019/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst4/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://modis.gsfc.nasa.gov/data/atbd/atbd_mod25.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "http://www.ghrsst.org"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/forum/viewforum.php?f=18&sid=e2d67e5a01815fc6e39fcd2087ed8bc8"
+      },
+      {
+        "inherited": true,
+        "length": "75.0MB",
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1940473819-POCLOUD"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/tutorials/blob/master/notebooks/MODIS_L2P_SST_DataCube.ipynb"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://search.earthdata.nasa.gov/search/granules?p=C1940473819-POCLOUD"
+      }
+    ]
+  },
+  {
+    "time_start": "2020-06-10T12:25:00.000Z",
+    "updated": "2020-12-03T12:56:29.493Z",
+    "dataset_id": "GHRSST Level 2P Global Sea Surface Skin Temperature from the Moderate Resolution Imaging Spectroradiometer (MODIS) on the NASA Aqua satellite (GDS2)",
+    "data_center": "POCLOUD",
+    "title": "20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0",
+    "coordinate_system": "CARTESIAN",
+    "day_night_flag": "UNSPECIFIED",
+    "time_end": "2020-06-10T12:29:59.000Z",
+    "id": "G1966661315-POCLOUD",
+    "original_format": "UMM_JSON",
+    "granule_size": "25.85776615142822",
+    "browse_flag": true,
+    "polygons": [
+      [
+        "-55.7963 50.84799 -48.68772 43.7224 -39.73191 37.67358 -42.67619 23.93465 -43.77265 9.43189 -61.65661 10.03802 -60.35685 31.75646 -55.7963 50.84799"
+      ]
+    ],
+    "collection_concept_id": "C1940473819-POCLOUD",
+    "online_access_flag": true,
+    "links": [
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/s3#",
+        "title": "This link provides direct download access via S3 to the granule.",
+        "hreflang": "en-US",
+        "href": "s3://podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc.md5"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "Download 20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.nc"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "Download 20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.cmr.json"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+        "title": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "title": "OPeNDAP request URL",
+        "hreflang": "en-US",
+        "href": "https://opendap.earthdata.nasa.gov/providers/POCLOUD/collections/GHRSST%20Level%202P%20Global%20Sea%20Surface%20Skin%20Temperature%20from%20the%20Moderate%20Resolution%20Imaging%20Spectroradiometer%20(MODIS)%20on%20the%20NASA%20Aqua%20satellite%20(GDS2)/granules/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sea_surface_temperature.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.quality_level.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_bias.png"
+      },
+      {
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/browse#",
+        "type": "image/png",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-public/MODIS_A-JPL-L2P-v2019.0/20200610122500-JPL-L2P_GHRSST-SSTskin-MODIS_A-N-v02.0-fv01.0.sses_standard_deviation.png"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/CitingPODAAC"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/data-readers"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-docs/ghrsst/open/docs/GDS20r5.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://ghrsst.jpl.nasa.gov"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/flag/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/reprocessing/r2019/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst4/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://modis.gsfc.nasa.gov/data/atbd/atbd_mod25.pdf"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://oceancolor.gsfc.nasa.gov/atbd/sst/"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "http://www.ghrsst.org"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://podaac.jpl.nasa.gov/forum/viewforum.php?f=18&sid=e2d67e5a01815fc6e39fcd2087ed8bc8"
+      },
+      {
+        "inherited": true,
+        "length": "75.0MB",
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1940473819-POCLOUD"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+        "hreflang": "en-US",
+        "href": "https://github.com/podaac/tutorials/blob/master/notebooks/MODIS_L2P_SST_DataCube.ipynb"
+      },
+      {
+        "inherited": true,
+        "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+        "hreflang": "en-US",
+        "href": "https://search.earthdata.nasa.gov/search/granules?p=C1940473819-POCLOUD"
+      }
+    ]
+  }
+]

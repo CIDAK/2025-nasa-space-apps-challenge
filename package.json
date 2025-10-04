@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node src/main.js"
+    "download": "node src/downloadPodaac.js",
+    "dev": "node src/main.js",
+    "fetch-nasa": "node src/fetchNasaData.js"
   },
   "dependencies": {
     "axios": "^1.12.2",
