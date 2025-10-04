@@ -1,0 +1,48 @@
+Aqua-MODIS: NASA Earth-Observing Instrument Biography
+
+Overview:
+Aqua is a NASA Earth-observing satellite launched on May 4, 2002, as part of the Earth Observing System (EOS). Its primary mission is to monitor Earth's water cycle, including precipitation, evaporation, and the cycling of water in the atmosphere, land, and oceans. The satellite carries several instruments, among which MODIS (Moderate Resolution Imaging Spectroradiometer) is a key sensor.
+
+MODIS Instrument:
+MODIS is a high-technology imaging spectroradiometer that captures data in 36 spectral bands ranging from visible to thermal infrared wavelengths (0.4 to 14.4 micrometers). This broad spectral coverage allows the instrument to observe a wide variety of Earth system processes. MODIS has a swath width of 2,330 km and provides near-daily coverage of the entire Earth's surface, making it ideal for global monitoring.
+
+Primary Observations:
+1. Atmosphere:
+   - Cloud cover and cloud types
+   - Aerosol and dust concentrations
+   - Water vapor content
+   - Temperature profiles
+
+2. Land:
+   - Vegetation health and coverage (NDVI)
+   - Land surface temperature
+   - Snow and ice cover
+   - Fire detection and burned area mapping
+
+3. Oceans:
+   - Sea surface temperature
+   - Ocean color, indicating chlorophyll and plankton concentrations
+   - Phytoplankton blooms
+   - Sediment and turbidity levels
+
+4. Cryosphere:
+   - Sea ice extent and movement
+   - Glacial changes
+
+Applications:
+- Climate monitoring and modeling
+- Weather forecasting
+- Drought and flood assessment
+- Ocean ecosystem studies
+- Carbon cycle and vegetation studies
+
+Cool fact for cidak:
+Revolution no.	74897 and counting
+
+Check Orbital parameters
+
+Impact:
+Since its launch, Aqua-MODIS has provided scientists with invaluable data for understanding Earth system processes. Its near-real-time data supports environmental monitoring, climate research, disaster response, and sustainable resource management.
+
+Wikipedia Link:
+https://en.wikipedia.org/wiki/Aqua_(satellite)#MODIS

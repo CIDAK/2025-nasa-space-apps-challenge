@@ -1,0 +1,52 @@
+Orbital Mechanics and Aerodynamics: Overview
+
+1. Orbital Mechanics (Astrodynamics):
+Orbital mechanics, also called astrodynamics, is the study of the motion of objects in space under the influence of gravity. It deals with predicting and analyzing the trajectories of spacecraft, satellites, planets, and other celestial bodies.
+
+Key Concepts:
+- Newton’s laws of motion and universal gravitation
+- Kepler’s laws of planetary motion
+- Orbital elements (semi-major axis, eccentricity, inclination, etc.)
+- Types of orbits: circular, elliptical, parabolic, hyperbolic
+- Maneuvers: Hohmann transfer, bi-elliptic transfer, plane changes
+- Perturbations: effects of atmospheric drag, solar radiation, and gravitational influences
+
+Applications:
+- Satellite launch and placement
+- Space mission planning and navigation
+- Interplanetary travel
+- Predicting asteroid/comet paths
+
+2. Aerodynamics:
+Aerodynamics is the study of how gases interact with moving objects. It focuses on the forces and motion of objects through the atmosphere, including lift, drag, and thrust.
+
+Key Concepts:
+- Bernoulli’s principle and Navier-Stokes equations
+- Lift, drag, thrust, and weight
+- Airfoil and wing design
+- Boundary layers and turbulence
+- Supersonic and hypersonic flow
+- Computational Fluid Dynamics (CFD)
+
+Applications:
+- Aircraft design and optimization
+- Rocket and spacecraft atmospheric flight
+- Wind tunnel testing and simulation
+- Automotive and industrial aerodynamics
+
+3. Universities Where You Can Study Orbital Mechanics and Aerodynamics:
+
+1. Massachusetts Institute of Technology (MIT), USA
+2. Stanford University, USA
+3. California Institute of Technology (Caltech), USA
+4. University of Cambridge, UK
+5. Imperial College London, UK
+6. Technical University of Munich (TUM), Germany
+7. ETH Zurich, Switzerland
+8. National University of Singapore (NUS), Singapore
+9. Tsinghua University, China
+10. Indian Institute of Technology (IIT) Bombay, India
+
+Wikipedia Links for Reference:
+- Orbital Mechanics: https://en.wikipedia.org/wiki/Orbital_mechanics
+- Aerodynamics: https://en.wikipedia.org/wiki/Aerodynamics

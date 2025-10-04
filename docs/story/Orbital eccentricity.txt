@@ -1,0 +1,39 @@
+Orbital Eccentricity: Detailed Overview
+
+Overview:
+Orbital eccentricity is a fundamental parameter in celestial mechanics that measures the deviation of an orbit from a perfect circle. It is a dimensionless number that ranges from 0 to 1 for bound orbits:
+   - e = 0: perfectly circular orbit
+   - 0 < e < 1: elliptical orbit
+   - e = 1: parabolic trajectory (escape orbit)
+   - e > 1: hyperbolic trajectory (unbound orbit)
+
+Definition:
+Eccentricity (e) is defined mathematically for an elliptical orbit as:
+   e = c / a
+where:
+   - c is the distance from the center of the ellipse to the focus (usually the central body, e.g., Sun),
+   - a is the semi-major axis of the ellipse.
+
+Significance:
+Orbital eccentricity determines the shape of an orbit and affects the orbital dynamics of planets, moons, and artificial satellites. It influences:
+   - The variation of orbital speed along the orbit
+   - The closest approach to the central body (periapsis/perihelion)
+   - The farthest distance from the central body (apoapsis/aphelion)
+   - Seasonal variations for planets with significant eccentricity
+
+Examples in the Solar System:
+- Earth: e ≈ 0.0167 (nearly circular)
+- Mercury: e ≈ 0.2056 (more elliptical)
+- Halley's Comet: e ≈ 0.967 (highly elongated orbit)
+
+Applications:
+- Predicting satellite trajectories and planning space missions
+- Understanding planetary climate cycles (e.g., Milankovitch cycles)
+- Studying asteroid and comet dynamics
+- Modeling binary star orbits and exoplanet systems
+
+Impact:
+Orbital eccentricity is essential for astrophysics, space exploration, and understanding long-term planetary behavior. Small changes in eccentricity can lead to significant climatic and orbital consequences over astronomical timescales.
+
+Wikipedia Link:
+https://en.wikipedia.org/wiki/Orbital_eccentricity
