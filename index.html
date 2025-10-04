@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,27 +10,10 @@
       overflow: hidden;
       font-family: monospace;
     }
-
-    #info {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: white;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 10px;
-      border-radius: 5px;
-      z-index: 100;
-    }
   </style>
 </head>
-
 <body>
-  <div id="info">
-    <h3>NASA Ocean Temperature VR</h3>
-    <p>Desktop: Arrow keys to navigate frames, Space to auto-play</p>
-    <p>VR: Left/Right controller triggers to navigate</p>
-  </div>
-  <script type="module" src="/src/three.js"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/index.jsx"></script>
 </body>
-
 </html>

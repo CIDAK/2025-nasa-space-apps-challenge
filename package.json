@@ -13,11 +13,13 @@
     "axios": "^1.12.2",
     "dotenv": "^17.2.3",
     "fs": "^0.0.1-security",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "three": "^0.180.0",
     "webxr-polyfill": "^2.0.3"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
     "vite": "^7.1.7"
   }
 }
-

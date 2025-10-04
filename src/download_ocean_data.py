@@ -9,7 +9,6 @@ def download_nasa_ocean_data(start_date, end_date, output_dir='./data'):
     # CMR API endpoint
     base_url = "https://cmr.earthdata.nasa.gov/search/granules.json"
     
-    # Collections that existed in 2020
     collections = [
         'MODIS_A-JPL-L2P-v2019.0',  # MODIS Aqua SST
         'VIIRS_NPP-OSPO-L2P-v2.61',  # VIIRS SST
