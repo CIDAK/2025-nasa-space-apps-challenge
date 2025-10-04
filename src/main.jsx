@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { XRDevice, metaQuest3 } from 'iwer';
-// Add this import at the top of main.jsx
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export default function NASAOceanVR() {
   const containerRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [zoomMode, setZoomMode] = useState(false);
+  const [targetObject, setTargetObject] = useState(null);
   
   useEffect(() => {
     if (!containerRef.current) return;
@@ -45,6 +46,109 @@ export default function NASAOceanVR() {
     controls.maxDistance = 50;
     controls.enablePan = false; // Disable panning to keep user at center
     controls.update();
+    
+    // ===============================
+    // ZOOM FUNCTIONALITY
+    // ===============================
+    let originalCameraPosition = new THREE.Vector3();
+    let originalControlsTarget = new THREE.Vector3();
+    let originalMinDistance = 0.1;
+    let originalMaxDistance = 50;
+
+    // Function to detect object in front of user
+    function getObjectInFront() {
+      const raycaster = new THREE.Raycaster();
+      const direction = new THREE.Vector3(0, 0, -1); // Forward direction
+      
+      raycaster.set(camera.position, direction);
+      
+      const objectsToCheck = [];
+      if (earth) objectsToCheck.push(earth);
+      if (aquaSat) objectsToCheck.push(aquaSat);
+      
+      const intersects = raycaster.intersectObjects(objectsToCheck);
+      
+      if (intersects.length > 0) {
+        return intersects[0].object;
+      }
+      return null;
+    }
+
+    // Function to zoom into object
+    function zoomIntoObject(object) {
+      if (!object || zoomMode) return;
+      
+      // Store original camera settings
+      originalCameraPosition.copy(camera.position);
+      originalControlsTarget.copy(controls.target);
+      originalMinDistance = controls.minDistance;
+      originalMaxDistance = controls.maxDistance;
+      
+      // Set zoom mode
+      setZoomMode(true);
+      setTargetObject(object);
+      
+      // Calculate new camera position
+      const objectPosition = object.position.clone();
+      const boundingBox = new THREE.Box3().setFromObject(object);
+      const size = boundingBox.getSize(new THREE.Vector3());
+      const maxDimension = Math.max(size.x, size.y, size.z);
+      
+      // Position camera in front of object
+      const distance = maxDimension * 3; // 3x the object size
+      const newCameraPosition = objectPosition.clone();
+      newCameraPosition.z += distance;
+      
+      // Animate camera to new position
+      animateCamera(newCameraPosition, objectPosition, distance * 0.5, distance * 5);
+    }
+
+    // Function to zoom out of object
+    function zoomOutOfObject() {
+      if (!zoomMode) return;
+      
+      setZoomMode(false);
+      setTargetObject(null);
+      
+      // Animate back to original position
+      animateCamera(originalCameraPosition, originalControlsTarget, originalMinDistance, originalMaxDistance);
+    }
+
+    // Camera animation function
+    function animateCamera(targetPosition, targetLookAt, minDist, maxDist) {
+      const startPosition = camera.position.clone();
+      const startTarget = controls.target.clone();
+      const startMinDistance = controls.minDistance;
+      const startMaxDistance = controls.maxDistance;
+      
+      let progress = 0;
+      const duration = 800; // 1.5 seconds
+      const startTime = Date.now();
+      
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        progress = Math.min(elapsed / duration, 1);
+        
+        // Smooth easing
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        
+        // Interpolate camera position
+        camera.position.lerpVectors(startPosition, targetPosition, easedProgress);
+        controls.target.lerpVectors(startTarget, targetLookAt, easedProgress);
+        
+        // Interpolate zoom limits
+        controls.minDistance = THREE.MathUtils.lerp(startMinDistance, minDist, easedProgress);
+        controls.maxDistance = THREE.MathUtils.lerp(startMaxDistance, maxDist, easedProgress);
+        
+        controls.update();
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      }
+      
+      animate();
+    }
     
     // ===============================
     // WHITE PARTICLES BACKGROUND
@@ -99,56 +203,112 @@ export default function NASAOceanVR() {
       }
     );
     
-// ===============================
-// ===============================
-// SATELLITE 3D MODEL (BEHIND USER)
-// ===============================
-  const gltfLoader = new GLTFLoader();
-  gltfLoader.load(
-    '/assets/3Dmodels/nasa_aqua_eos_pm-1_satellite.glb',
-    (gltf) => {
-      console.log('Satellite model loaded successfully:', gltf);
+    // ===============================
+    // SATELLITE 3D MODEL (BEHIND USER)
+    // ===============================
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.load(
+      '/assets/3Dmodels/nasa_aqua_eos_pm-1_satellite.glb',
+      (gltf) => {
+        console.log('Satellite model loaded successfully:', gltf);
+        
+        aquaSat = gltf.scene;
+        
+        // Center the model
+        const box = new THREE.Box3().setFromObject(aquaSat);
+        const center = box.getCenter(new THREE.Vector3());
+        aquaSat.position.sub(center); // Center the model
+        
+        // Position behind user
+        aquaSat.position.set(0, 0, 25);
+        
+        // Scale the model (adjust as needed)
+        aquaSat.scale.set(5, 5, 5);
+        
+        // Add lighting for better visibility
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(10, 10, 5);
+        scene.add(directionalLight);
+        
+        scene.add(aquaSat);
+        console.log('Satellite added to scene at position:', aquaSat.position);
+        
+        // Add button above
+        const buttonGeometry = new THREE.BoxGeometry(2.5, 0.7, 0.3);
+        const buttonMaterial = new THREE.MeshBasicMaterial({ color: 0x0077ff });
+        const button = new THREE.Mesh(buttonGeometry, buttonMaterial);
+        button.position.set(aquaSat.position.x - 5, aquaSat.position.y / 2, aquaSat.position.z); // Position above the satellite
+        scene.add(button);
+      },
+      (progress) => {
+        console.log('Loading satellite model:', Math.round(progress.loaded / progress.total * 100) + '%');
+      },
+      (error) => {
+        console.error('Error loading satellite model:', error);
+        console.log('Creating fallback blue sphere...');
+      }
+    );
+
+    // ===============================
+    // CLICK FUNCTIONALITY
+    // ===============================
+    const handleClick = (event) => {
+      // Calculate mouse position in normalized device coordinates
+      const mouse = new THREE.Vector2();
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       
-      aquaSat = gltf.scene;
+      // Create raycaster
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
       
-      // Center the model
-      const box = new THREE.Box3().setFromObject(aquaSat);
-      const center = box.getCenter(new THREE.Vector3());
-      aquaSat.position.sub(center); // Center the model
+      // Check for intersections
+      const objectsToCheck = [];
+      if (earth) objectsToCheck.push(earth);
+      if (aquaSat) objectsToCheck.push(aquaSat);
       
-      // Position behind user
-      aquaSat.position.set(0, 0, 25);
+      const intersects = raycaster.intersectObjects(objectsToCheck);
       
-      // Scale the model (adjust as needed)
-      aquaSat.scale.set(5, 5, 5);
-      
-      // Add lighting for better visibility
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambientLight);
-      
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      directionalLight.position.set(10, 10, 5);
-      scene.add(directionalLight);
-      
-      scene.add(aquaSat);
-      console.log('Satellite added to scene at position:', aquaSat.position);
-    // Add button above
-      const buttonGeometry = new THREE.BoxGeometry(12, 4, 2);
-      const buttonMaterial = new THREE.MeshBasicMaterial({ color: 0x0077ff });
-      const button = new THREE.Mesh(buttonGeometry, buttonMaterial);
-      button.position.set(aquaSat.position.x, aquaSat.position.y + 5, aquaSat.position.z); // Position above the satellite
-      scene.add(button);
-    },
-    (progress) => {
-      console.log('Loading satellite model:', Math.round(progress.loaded / progress.total * 100) + '%');
-    },
-    (error) => {
-      console.error('Error loading satellite model:', error);
-      console.log('Creating fallback blue sphere...');
-      
-      
-    }
-);
+      if (intersects.length > 0) {
+        const clickedObject = intersects[0].object;
+        
+        if (!zoomMode) {
+          zoomIntoObject(clickedObject);
+        } else if (targetObject === clickedObject) {
+          zoomOutOfObject();
+        }
+      }
+    };
+
+    renderer.domElement.addEventListener('click', handleClick);
+
+    // ===============================
+    // KEYBOARD CONTROLS
+    // ===============================
+    const handleKeyDown = (event) => {
+      switch (event.code) {
+        case 'KeyZ':
+          if (!zoomMode) {
+            const objectInFront = getObjectInFront();
+            if (objectInFront) {
+              zoomIntoObject(objectInFront);
+            }
+          } else {
+            zoomOutOfObject();
+          }
+          break;
+        case 'Escape':
+          if (zoomMode) {
+            zoomOutOfObject();
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
     
     // ===============================
     // ANIMATION LOOP
@@ -161,7 +321,7 @@ export default function NASAOceanVR() {
         earth.rotation.y += 0.005;
       }
       
-      // Rotate blue planet slowly
+      // Rotate satellite slowly
       if (aquaSat) {
         aquaSat.rotation.y += 0.002;
       }
@@ -196,6 +356,8 @@ export default function NASAOceanVR() {
     // ===============================
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeyDown);
+      renderer.domElement.removeEventListener('click', handleClick);
       if (containerRef.current && renderer.domElement) {
         containerRef.current.removeChild(renderer.domElement);
       }
@@ -253,10 +415,16 @@ export default function NASAOceanVR() {
         fontSize: '14px',
         maxWidth: '300px'
       }}>
-        <strong>Space Explorer:</strong><br/>
+        <strong>{zoomMode ? `Zoomed: ${targetObject === earth ? 'Earth' : 'Satellite'}` : 'Space Explorer'}:</strong><br/>
         🖱️ Mouse: Look around (rotate view)<br/>
         🔄 Mouse wheel: Zoom in/out<br/>
-        🌍 Earth is in front, 🛰️ Satellite is behind you
+        🖱️ Click: Zoom into object<br/>
+        ⌨️ Z: Zoom into object in front<br/>
+        ⌨️ Esc: Exit zoom mode<br/>
+        {zoomMode ? 
+          '🔍 In zoom mode - click object or press Esc to exit' : 
+          '🌍 Earth is in front, 🛰️ Satellite behind'
+        }
       </div>
     </div>
   );
