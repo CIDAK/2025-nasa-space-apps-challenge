@@ -45,4 +45,4 @@ node_modules
 *.dwo
 
 # env
-*.env
+.env
