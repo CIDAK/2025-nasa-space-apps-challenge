@@ -1,6 +1,6 @@
 # Key
 - Combine multiple datasets
-- Timelapse (SO speed dial option)
+- Timelapse (So speed dial option)
 - motion parallax
 - sound effects
 - Music (Important, background) (background trends)
@@ -16,7 +16,7 @@
 # Important pointers
 
 - when a user comes close to something, a popup dialog will appear for them to read. 
-- optional language layers, use a translator. (Brazil, Sigapore, United Kingdom)
+- optional language layers, use a translator. (Brazil, Singapore, United Kingdom)
 - beginning, middle and end
 
 
