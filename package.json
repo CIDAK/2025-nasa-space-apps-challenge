@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "download": "node src/downloadPodaac.js",
-    "dev": "node src/main.js",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "fetch-nasa": "node src/fetchNasaData.js"
   },
   "dependencies": {
