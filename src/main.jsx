@@ -6,14 +6,294 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export default function NASAOceanVR() {
   const containerRef = useRef(null);
+  const astronautSceneRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [zoomMode, setZoomMode] = useState(false);
   const [targetObject, setTargetObject] = useState(null);
+  const [selectedObject, setSelectedObject] = useState(null); // Add this new state
   
   // Add refs to track current state for event handlers
   const zoomModeRef = useRef(false);
   const targetObjectRef = useRef(null);
+  
+  // Astronaut scene refs
+  const astronautRendererRef = useRef(null);
+  const astronautCameraRef = useRef(null);
+  const astronautRef = useRef(null);
+  
+  // ===============================
+  // ASTRONAUT MINI SCENE SETUP
+  // ===============================
+  useEffect(() => {
+    if (!selectedObject || !astronautSceneRef.current) return;
+    
+    // Clear previous scene if it exists
+    if (astronautRendererRef.current) {
+      // Check if the DOM element exists and is a child before removing
+      if (astronautRendererRef.current.domElement && 
+          astronautSceneRef.current && 
+          astronautSceneRef.current.contains(astronautRendererRef.current.domElement)) {
+        astronautSceneRef.current.removeChild(astronautRendererRef.current.domElement);
+      }
+      astronautRendererRef.current.dispose();
+      astronautRendererRef.current = null;
+    }
+    
+    // Create mini scene for astronaut
+    const astronautScene = new THREE.Scene();
+    astronautScene.background = new THREE.Color(0x000000); // Pure black background
+    
+    // Create camera for astronaut scene
+    const astronautCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 100);
+    astronautCamera.position.set(0, 0, 12); // Moved closer for larger astronaut
+    astronautCameraRef.current = astronautCamera;
+    
+    // Create renderer for astronaut scene
+    const astronautRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    astronautRenderer.setSize(120, 120);
+    astronautRenderer.setPixelRatio(window.devicePixelRatio);
+    astronautRenderer.outputColorSpace = THREE.SRGBColorSpace;
+    astronautRenderer.setClearColor(0x000000, 1); // Pure black background
+    astronautRendererRef.current = astronautRenderer;
+    
+    // Enhanced lighting for astronaut scene
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); // Increased ambient light
+    astronautScene.add(ambientLight);
+    
+    // Multiple directional lights for better illumination
+    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+    directionalLight1.position.set(5, 5, 5);
+    astronautScene.add(directionalLight1);
+    
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight2.position.set(-5, -5, 5);
+    astronautScene.add(directionalLight2);
+    
+    const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.6);
+    directionalLight3.position.set(0, -5, -5);
+    astronautScene.add(directionalLight3);
+    
+    // Add rim lighting for better definition
+    const rimLight = new THREE.DirectionalLight(0x4488ff, 0.5);
+    rimLight.position.set(-10, 0, -10);
+    astronautScene.add(rimLight);
+    
+    // Create orbit controls for astronaut scene
+    let astronautControls = null;
+    
+    // Store animation frame ID for cleanup
+    let animationFrameId = null;
+    
+    // Mouse interaction variables
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    let spherical = new THREE.Spherical();
+    spherical.setFromVector3(astronautCamera.position);
+    
+    // Mouse event handlers for 360 view
+    function onMouseDown(event) {
+      isDragging = true;
+      previousMousePosition = {
+        x: event.clientX,
+        y: event.clientY
+      };
+      event.preventDefault();
+    }
+    
+    function onMouseMove(event) {
+      if (!isDragging) return;
+      
+      const deltaMove = {
+        x: event.clientX - previousMousePosition.x,
+        y: event.clientY - previousMousePosition.y
+      };
+      
+      // Update spherical coordinates
+      spherical.theta -= deltaMove.x * 0.01; // Horizontal rotation
+      spherical.phi += deltaMove.y * 0.01;   // Vertical rotation
+      
+      // Limit vertical rotation
+      spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
+      
+      // Update camera position
+      astronautCamera.position.setFromSpherical(spherical);
+      astronautCamera.lookAt(0, 0, 0);
+      
+      previousMousePosition = {
+        x: event.clientX,
+        y: event.clientY
+      };
+    }
+    
+    function onMouseUp() {
+      isDragging = false;
+    }
+    
+    // Mouse wheel for zoom in astronaut scene
+    function onWheel(event) {
+      event.preventDefault();
+      
+      const delta = event.deltaY * 0.01;
+      spherical.radius += delta;
+      spherical.radius = Math.max(8, Math.min(20, spherical.radius)); // Limit zoom range
+      
+      astronautCamera.position.setFromSpherical(spherical);
+      astronautCamera.lookAt(0, 0, 0);
+    }
+    
+    // Load astronaut model
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.load(
+      '/assets/3Dmodels/cute_astronaut.glb',
+      (gltf) => {
+        const astronaut = gltf.scene;
+        astronautRef.current = astronaut;
+        
+        // Enhance astronaut materials with better lighting response
+        astronaut.traverse((child) => {
+          if (child.isMesh) {
+            if (child.material) {
+              // Remove emissive for more realistic lighting
+              child.material.emissive = new THREE.Color(0x000000);
+              child.material.emissiveIntensity = 0;
+              child.material.needsUpdate = true;
+              
+              // Enhance material properties for better lighting
+              if (child.material.color) {
+                child.material.color.multiplyScalar(1.8); // Brighter base color
+              }
+              
+              // Add roughness and metalness for better material response
+              if (child.material.roughness !== undefined) {
+                child.material.roughness = 0.7;
+              }
+              if (child.material.metalness !== undefined) {
+                child.material.metalness = 0.1;
+              }
+            }
+          }
+        });
+        
+        // Center and scale the astronaut to be larger
+        const box = new THREE.Box3().setFromObject(astronaut);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        
+        
+        // Center the astronaut at origin (0, 0, 0)
+        astronaut.position.set(-center.x, -6, -center.z);
+        
+        // Scale to be larger - fill more of the scene
+        const maxDimension = Math.max(size.x, size.y, size.z);
+        const targetSize = 10; // Increased from 8 to make astronaut larger
+        const scale = targetSize / maxDimension;
+        astronaut.scale.set(scale, scale, scale);
+        
+        astronautScene.add(astronaut);
+      },
+      undefined,
+      (error) => {
+        console.error('Failed to load astronaut for mini scene:', error);
+        // Create larger fallback astronaut
+        const fallbackGeometry = new THREE.BoxGeometry(8, 10, 5); // Larger fallback
+        const fallbackMaterial = new THREE.MeshLambertMaterial({ 
+          color: 0xFFFFFF
+        });
+        const astronaut = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
+        astronautRef.current = astronaut;
+        astronautScene.add(astronaut);
+      }
+    );
+    
+    // Add renderer to DOM and attach event listeners
+    if (astronautSceneRef.current && astronautRenderer.domElement) {
+      astronautSceneRef.current.appendChild(astronautRenderer.domElement);
+      
+      // Add mouse event listeners to the astronaut renderer canvas
+      const canvas = astronautRenderer.domElement;
+      canvas.addEventListener('mousedown', onMouseDown);
+      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('mouseup', onMouseUp);
+      canvas.addEventListener('mouseleave', onMouseUp);
+      canvas.addEventListener('wheel', onWheel);
+      
+      // Set cursor style
+      canvas.style.cursor = 'grab';
+      canvas.addEventListener('mousedown', () => {
+        canvas.style.cursor = 'grabbing';
+      });
+      canvas.addEventListener('mouseup', () => {
+        canvas.style.cursor = 'grab';
+      });
+    }
+    
+    // Animation loop for astronaut scene
+    function animateAstronaut() {
+      if (!astronautRendererRef.current || !selectedObject) {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+        }
+        return;
+      }
+      
+      animationFrameId = requestAnimationFrame(animateAstronaut);
+      
+      // Optional: Add subtle rotation when not being dragged
+      if (!isDragging && astronautRef.current) {
+        astronautRef.current.rotation.y += 0.005; // Slow auto-rotation
+      }
+      
+      astronautRenderer.render(astronautScene, astronautCamera);
+    }
+    
+    animateAstronaut();
+    
+    // Cleanup function
+    return () => {
+      // Cancel animation frame
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      
+      // Remove event listeners
+      if (astronautRendererRef.current?.domElement) {
+        const canvas = astronautRendererRef.current.domElement;
+        canvas.removeEventListener('mousedown', onMouseDown);
+        canvas.removeEventListener('mousemove', onMouseMove);
+        canvas.removeEventListener('mouseup', onMouseUp);
+        canvas.removeEventListener('mouseleave', onMouseUp);
+        canvas.removeEventListener('wheel', onWheel);
+      }
+      
+      // Clean up renderer
+      if (astronautRendererRef.current) {
+        // Check if the DOM element exists and is a child before removing
+        if (astronautRendererRef.current.domElement && 
+            astronautSceneRef.current && 
+            astronautSceneRef.current.contains(astronautRendererRef.current.domElement)) {
+          try {
+            astronautSceneRef.current.removeChild(astronautRendererRef.current.domElement);
+          } catch (error) {
+            console.warn('Could not remove astronaut renderer DOM element:', error);
+          }
+        }
+        
+        // Dispose of renderer
+        try {
+          astronautRendererRef.current.dispose();
+        } catch (error) {
+          console.warn('Could not dispose astronaut renderer:', error);
+        }
+        
+        astronautRendererRef.current = null;
+      }
+      
+      // Clear astronaut reference
+      astronautRef.current = null;
+    };
+  }, [selectedObject]);
+  // End astronaut scene setup useEffect
   
   useEffect(() => {
     if (!containerRef.current) return;
@@ -177,6 +457,9 @@ export default function NASAOceanVR() {
       
       console.log('Clicked object:', targetObj.userData?.name || 'Unknown');
       
+      // Set the selected object for the overlay
+      setSelectedObject(targetObj.userData?.name || 'Unknown Object');
+      
       // Custom click handlers for specific objects
       // Earth
       if (targetObj.userData?.name === 'Earth') {
@@ -235,10 +518,11 @@ export default function NASAOceanVR() {
       if (intersects.length > 0) {
         handleObjectClick(intersects[0].object);
       } else {
-        // Clicked on empty space - exit zoom mode
+        // Clicked on empty space - exit zoom mode and clear selected object
         if (zoomModeRef.current) {
           zoomOutOfObject();
         }
+        setSelectedObject(null); // Clear the overlay when clicking empty space
       }
     }
     
@@ -1068,6 +1352,94 @@ function restoreEarthTexture() {
           borderRadius: '10px'
         }}>
           {error}
+        </div>
+      )}
+      
+      {/* Selected Object Overlay with Astronaut Scene */}
+      {selectedObject && (
+        <div style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          color: 'white',
+          background: 'rgba(0,0,0,0.8)',
+          padding: '15px',
+          borderRadius: '10px',
+          fontFamily: 'Arial, sans-serif',
+          fontSize: '14px',
+          maxWidth: '320px',
+          height: 'calc(100vh - 20px)',
+          overflowY: 'auto',
+          border: '2px solid rgba(255,255,255,0.1)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+            <strong style={{ fontSize: '16px' }}>{selectedObject}</strong>
+            
+            {/* Astronaut Scene Corner */}
+            <div 
+              ref={astronautSceneRef}
+              style={{
+                marginLeft: 'auto',
+                width: '120px',
+                height: '120px',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                border: '1px solid rgba(255,255,255,0.2)',
+                backgroundColor: 'rgba(0,0,0,0.5)'
+              }}
+            />
+          </div>
+          
+          <div style={{ fontSize: '12px', opacity: 0.9, lineHeight: '1.4' }}>
+            <p>Click here to learn more about <strong>{selectedObject}</strong> or ask questions about its properties, composition, and characteristics.</p>
+            
+            {selectedObject === 'Earth' && (
+              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: 'rgba(0,100,200,0.2)', borderRadius: '5px' }}>
+                🌍 <strong>Earth Facts:</strong><br/>
+                • Third planet from the Sun<br/>
+                • Only known planet with life<br/>
+                • 71% water surface coverage<br/>
+                • Diameter: 12,742 km
+              </div>
+            )}
+            
+            {selectedObject === 'AquaSat' && (
+              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: 'rgba(0,170,255,0.2)', borderRadius: '5px' }}>
+                🛰️ <strong>Aqua Satellite:</strong><br/>
+                • Monitors Earth's water cycle<br/>
+                • Launched in 2002<br/>
+                • Orbits 705 km above Earth<br/>
+                • Studies ocean temperature & clouds
+              </div>
+            )}
+            
+            {selectedObject === 'Sun' && (
+              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: 'rgba(255,215,0,0.2)', borderRadius: '5px' }}>
+                ☀️ <strong>The Sun:</strong><br/>
+                • Center of our solar system<br/>
+                • Contains 99.86% of system's mass<br/>
+                • Surface temperature: 5,778 K<br/>
+                • Powers life on Earth
+              </div>
+            )}
+          </div>
+          
+          <button 
+            onClick={() => setSelectedObject(null)}
+            style={{
+              marginTop: '15px',
+              padding: '8px 16px',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '5px',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '12px',
+              width: '100%'
+            }}
+          >
+            Close
+          </button>
         </div>
       )}
       
