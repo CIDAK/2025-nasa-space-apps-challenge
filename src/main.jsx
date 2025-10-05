@@ -765,6 +765,39 @@ export default function NASAOceanVR() {
       }
     }
 
+    // function zoomIntoObject(object) {
+    //   if (!object || zoomModeRef.current) return;
+
+    //   console.log('🔍 Zooming into:', object.userData?.name);
+
+    //   if (manualMovement) toggleManualMovement();
+
+    //   originalCameraPosition.copy(camera.position);
+    //   originalControlsTarget.copy(controls.target);
+    //   originalMinDistance = controls.minDistance;
+    //   originalMaxDistance = controls.maxDistance;
+
+    //   zoomModeRef.current = true;
+
+    //   let objectPosition = object.position.clone();
+    //   let objectSize = 5;
+
+    //   const distance = Math.max(objectSize * 2.5, 10);
+    //   const cameraOffset = new THREE.Vector3(0, 0, distance);
+    //   const newCameraPosition = objectPosition.clone().add(cameraOffset);
+
+    //   animateCameraTo(
+    //     newCameraPosition,
+    //     objectPosition,
+    //     distance * 0.3,
+    //     distance * 3,
+    //     () => {
+    //       setZoomMode(true);
+    //       setTargetObject(object);
+    //     },
+    //   );
+    // }
+
     function zoomIntoObject(object) {
       if (!object || zoomModeRef.current) return;
 
@@ -779,9 +812,35 @@ export default function NASAOceanVR() {
 
       zoomModeRef.current = true;
 
+      // Default position & size
       let objectPosition = object.position.clone();
       let objectSize = 5;
 
+      //  Special handling for the Sun
+      if (object.userData?.name === 'Sun') {
+        // Define how far outside the Sun you want to zoom
+        const sunOffsetDistance = 50;
+
+        // Keep camera on the +Z axis looking at (0,0,0)
+        const cameraOffset = new THREE.Vector3(0, 0, sunOffsetDistance);
+        const newCameraPosition = new THREE.Vector3()
+          .copy(objectPosition)
+          .add(cameraOffset);
+
+        animateCameraTo(
+          newCameraPosition,
+          objectPosition,
+          sunOffsetDistance * 0.5,
+          sunOffsetDistance * 2,
+          () => {
+            setZoomMode(true);
+            setTargetObject(object);
+          },
+        );
+        return;
+      }
+
+      //  Default behavior for other planets/satellites
       const distance = Math.max(objectSize * 2.5, 10);
       const cameraOffset = new THREE.Vector3(0, 0, distance);
       const newCameraPosition = objectPosition.clone().add(cameraOffset);
