@@ -46,6 +46,7 @@ import {
   AQUA_SAT_CONFIG,
 } from './satellite/Satellite.jsx';
 import AboutDialog from './about.jsx';
+import { XRControllerModelFactory } from 'three/examples/jsm/Addons.js';
 
 export default function NASAOceanVR() {
   const containerRef = useRef(null);
@@ -79,6 +80,14 @@ export default function NASAOceanVR() {
 
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef(null);
+
+  // ===============================
+  // Desktop Keyboard Movement
+  // ===============================
+  const velocity = new THREE.Vector3();
+  const direction = new THREE.Vector3();
+  const moveSpeed = 1.0;
+  const keysPressed = {};
 
   // ===============================
   // API CALL HANDLER
@@ -441,6 +450,91 @@ export default function NASAOceanVR() {
     renderer.domElement.style.zIndex = '1'; // Keep this low
     containerRef.current.appendChild(renderer.domElement);
 
+    renderer.xr.enabled = true; // This allows the teleport features to work in VR mode
+
+    // 🎮 Setup VR Controllers
+    const controller1 = renderer.xr.getController(0);
+    const controller2 = renderer.xr.getController(1);
+    scene.add(controller1);
+    scene.add(controller2);
+
+    const controllerModelFactory = new XRControllerModelFactory();
+    const controllerGrip1 = renderer.xr.getControllerGrip(0);
+    controllerGrip1.add(
+      controllerModelFactory.createControllerModel(controllerGrip1),
+    );
+    scene.add(controllerGrip1);
+
+    const controllerGrip2 = renderer.xr.getControllerGrip(1);
+    controllerGrip2.add(
+      controllerModelFactory.createControllerModel(controllerGrip2),
+    );
+    scene.add(controllerGrip2);
+
+    // 🔵 Teleport Pointer Rays
+    function buildTeleportRay(controller) {
+      const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 0, -1),
+      ]);
+      const material = new THREE.LineBasicMaterial({ color: 0x00ffff });
+      const line = new THREE.Line(geometry, material);
+      line.scale.z = 5;
+      controller.add(line);
+    }
+
+    buildTeleportRay(controller1);
+    buildTeleportRay(controller2);
+
+    // Make teleport rays initially invisible
+    controller1.userData.line = controller1.children.find((c) => c.isLine);
+    controller2.userData.line = controller2.children.find((c) => c.isLine);
+    controller1.userData.line.visible = false;
+    controller2.userData.line.visible = false;
+
+    // 🪄 Teleport Logic
+    const teleportRaycaster = new THREE.Raycaster();
+    const tempMatrix = new THREE.Matrix4();
+
+    function handleTeleport(controller) {
+      tempMatrix.identity().extractRotation(controller.matrixWorld);
+      teleportRaycaster.ray.origin.setFromMatrixPosition(
+        controller.matrixWorld,
+      );
+      teleportRaycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+
+      const intersects = teleportRaycaster.intersectObjects(
+        scene.children,
+        true,
+      );
+
+      for (let i = 0; i < intersects.length; i++) {
+        const intersect = intersects[i];
+        if (intersect.object.userData.teleportable) {
+          // move player camera to hit point
+          camera.position.copy(intersect.point);
+          break;
+        }
+      }
+    }
+
+    // Trigger-based teleport with visible beam
+    controller1.addEventListener('selectstart', () => {
+      controller1.userData.line.visible = true;
+      handleTeleport(controller1);
+    });
+    controller1.addEventListener('selectend', () => {
+      controller1.userData.line.visible = false;
+    });
+
+    controller2.addEventListener('selectstart', () => {
+      controller2.userData.line.visible = true;
+      handleTeleport(controller2);
+    });
+    controller2.addEventListener('selectend', () => {
+      controller2.userData.line.visible = false;
+    });
+
     camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -479,7 +573,6 @@ export default function NASAOceanVR() {
       manualMovement = !manualMovement;
 
       if (manualMovement) {
-        console.log('🎮 Enabling WASD movement mode');
         controls.enabled = false;
 
         // Try to request pointer lock with improved messaging
@@ -583,8 +676,6 @@ export default function NASAOceanVR() {
       const key = event.key.toLowerCase();
       keysPressed[key] = true;
 
-      console.log('🎮 Key detected:', key);
-
       // Handle movement keys (WASD/arrows)
       if (
         [
@@ -674,9 +765,9 @@ export default function NASAOceanVR() {
 
     // Add event listeners with proper cleanup
     // Comment out keyboard event listeners
-    // document.addEventListener('keydown', handleKeyDown, true);
-    // document.addEventListener('keyup', handleKeyUp, true);
-    // document.addEventListener('pointerlockchange', handlePointerLockChange);
+    document.addEventListener('keydown', handleKeyDown, true);
+    document.addEventListener('keyup', handleKeyUp, true);
+    document.addEventListener('pointerlockchange', handlePointerLockChange);
     window.addEventListener('resize', handleResize);
 
     console.log('✅ Mouse-only camera system initialized');
@@ -1368,6 +1459,24 @@ export default function NASAOceanVR() {
       })
       .catch((error) => console.error('Error creating Neptune:', error));
 
+    // 🌍 Teleportable Ground Plane
+    const groundGeometry = new THREE.PlaneGeometry(200, 200);
+    const groundMaterial = new THREE.MeshStandardMaterial({
+      color: 0x222222,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0, // invisible
+    });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -5;
+    ground.receiveShadow = true;
+
+    // 👇 this flag lets teleport know it's valid
+    ground.userData.teleportable = true;
+
+    scene.add(ground);
+
     // ===============================
     // ANIMATION LOOP
     // ===============================
@@ -1406,6 +1515,23 @@ export default function NASAOceanVR() {
         particles.rotation.y += 0.0002;
       }
 
+      // 🧍 Desktop movement (only when not in VR mode)
+      if (!renderer.xr.isPresenting) {
+        // only when not in VR mode
+        direction.set(0, 0, 0);
+        if (keysPressed['w'] || keysPressed['arrowup']) direction.z -= 1;
+        if (keysPressed['s'] || keysPressed['arrowdown']) direction.z += 1;
+        if (keysPressed['a'] || keysPressed['arrowleft']) direction.x -= 1;
+        if (keysPressed['d'] || keysPressed['arrowright']) direction.x += 1;
+
+        if (direction.lengthSq() > 0) {
+          direction.normalize();
+          direction.applyQuaternion(camera.quaternion); // move relative to where player’s looking
+          camera.position.addScaledVector(direction, moveSpeed);
+        }
+      }
+      // Handle WASD movement when in manual mode
+      updateCameraMovement();
       // Render scene
       renderer.render(scene, camera);
     }
@@ -1470,7 +1596,7 @@ export default function NASAOceanVR() {
 
   useEffect(() => {
     const audio = new Audio(
-      '/assets/music/rainy-lofi-city-lofi-music-332746.mp3',
+      './assets/music/rainy-lofi-city-lofi-music-332746.mp3',
     );
     audio.loop = true;
     audio.volume = 0.1;
@@ -1496,6 +1622,19 @@ export default function NASAOceanVR() {
       audioRef.current.muted = isMuted;
     }
   }, [isMuted]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => (keysPressed[e.key.toLowerCase()] = true);
+    const handleKeyUp = (e) => (keysPressed[e.key.toLowerCase()] = false);
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
 
   return (
     <div
