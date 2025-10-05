@@ -816,10 +816,10 @@ export default function NASAOceanVR() {
       let objectPosition = object.position.clone();
       let objectSize = 5;
 
-      // 🩵 Special handling for the Sun
+      //  Special handling for the Sun
       if (object.userData?.name === 'Sun') {
-        // Define how far outside the Sun you want to zoom (adjust as needed)
-        const sunOffsetDistance = 50; // in scene units
+        // Define how far outside the Sun you want to zoom
+        const sunOffsetDistance = 50;
 
         // Keep camera on the +Z axis looking at (0,0,0)
         const cameraOffset = new THREE.Vector3(0, 0, sunOffsetDistance);
@@ -837,10 +837,10 @@ export default function NASAOceanVR() {
             setTargetObject(object);
           },
         );
-        return; // Stop here — don’t run the default zoom code
+        return;
       }
 
-      // 🪐 Default behavior for other planets/satellites
+      //  Default behavior for other planets/satellites
       const distance = Math.max(objectSize * 2.5, 10);
       const cameraOffset = new THREE.Vector3(0, 0, distance);
       const newCameraPosition = objectPosition.clone().add(cameraOffset);
