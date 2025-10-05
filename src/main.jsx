@@ -1452,13 +1452,13 @@ function restoreEarthTexture() {
         fontSize: '12px',
         maxWidth: '400px',
         width: '380px',
-        height: '300px',
+        height: selectedObject ? '400px' : '10px',
         border: '2px solid rgba(255,255,255,0.1)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
           <div style={{ flex: 1 }}>
             <strong style={{ fontSize: '14px' }}>
-              {selectedObject ? `Ask about ${selectedObject}` : 'Ask the Astronaut'}
+              {selectedObject ? `Ask about ${selectedObject}` : 'Select an object first, then ask...'}
             </strong>
           </div>
           
