@@ -3,6 +3,17 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { XRDevice, metaQuest3 } from 'iwer';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { callAzureOpenAI, updateResponseDiv } from './api/AzureOpenAI.jsx';
+import { createEarth, changeEarthTexture, restoreEarthTexture, animateEarth, EARTH_CONFIG } from './planets/earth.jsx';
+import { createMoon, animateMoon, MOON_CONFIG } from './moon/Moon.jsx';
+import { createJupiter, animateJupiter, JUPITER_CONFIG } from './planets/Jupiter.jsx';
+import { createVenus, animateVenus, VENUS_CONFIG } from './planets/Venus.jsx';
+import { createUranus, animateUranus, URANUS_CONFIG } from './planets/Uranus.jsx';
+import { createMercury, animateMercury, MERCURY_CONFIG } from './planets/Mercury.jsx';
+import { createNeptune, animateNeptune, NEPTUNE_CONFIG } from './planets/Neptune.jsx';
+import { createSaturn, animateSaturn, SATURN_CONFIG } from './planets/Saturn.jsx';
+import { createMars, animateMars, MARS_CONFIG } from './planets/Mars.jsx';
+import { loadAquaSatellite, animateAquaSatellite, AQUA_SAT_CONFIG } from './satellite/Satellite.jsx';
 
 export default function NASAOceanVR() {
   const containerRef = useRef(null);
@@ -11,7 +22,7 @@ export default function NASAOceanVR() {
   const [error, setError] = useState(null);
   const [zoomMode, setZoomMode] = useState(false);
   const [targetObject, setTargetObject] = useState(null);
-  const [selectedObject, setSelectedObject] = useState(null); // Add this new state
+  const [selectedObject, setSelectedObject] = useState(null);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
@@ -23,6 +34,23 @@ export default function NASAOceanVR() {
   const astronautRendererRef = useRef(null);
   const astronautCameraRef = useRef(null);
   const astronautRef = useRef(null);
+  
+  // ===============================
+  // API CALL HANDLER
+  // ===============================
+  const handleAzureOpenAICall = async (userInput) => {
+    if (!selectedObject || !userInput.trim()) return;
+    
+    try {
+      setIsLoading(true);
+      const content = await callAzureOpenAI(userInput, selectedObject);
+      updateResponseDiv(content, false);
+    } catch (err) {
+      updateResponseDiv(err.message, true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   // ===============================
   // ASTRONAUT MINI SCENE SETUP
@@ -297,65 +325,6 @@ export default function NASAOceanVR() {
   }, [selectedObject]);
   // End astronaut scene setup useEffect
 
-  // API function to call Azure OpenAI
-  const callAzureOpenAI = async (userInput) => {
-    const apiKey = "5Om697To2BJ3g1oVDXiNpEpP0IfO6WwEcojJ4W6Hyms1FR5fYnaAJQQJ99BFACYeBjFXJ3w3AAAAACOG9UkB"; // Replace with your actual API key
-    const endpoint = "https://thinkerforai-azureaifoundry.cognitiveservices.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-01-01-preview"; // Replace with your actual endpoint
-    
-    const messages = [
-      { role: "system", content: `
-         1. You are CIDAK Space Explorer, a space explorer on a mission to gather information about the solar system and the satellite Aqua.
-          2. Your task is to ask the user insightful questions about various celestial bodies, the solar system, and Aqua. You may also inquire about the environment, scientific phenomena, and discoveries related to Aqua.
-          3. When responding, you will always include at least one element of curiosity or exploration. You may focus on topics like the nature of distant planets, the technology used for space exploration, or the mysteries surrounding Aqua.
-          4. You must ensure your responses are scientifically accurate and reflect the context of space exploration and satellite data collection. 
-          5. Always engage the user in a way that sparks further discussion about space, the solar system, and Aqua's role in Earth's climate and ocean monitoring.
-          8. If no valid continuation or question is possible, respond with: "I'm currently analyzing more data; let's return to the wonders of space exploration soon."`
-      },
-      { role: "user", content: `${userInput} about ${selectedObject}` }
-    ];
-
-    try {
-      setIsLoading(true);
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "api-key": apiKey
-        },
-        body: JSON.stringify({
-          messages: messages,
-          max_tokens: 800,
-          temperature: 1,
-          top_p: 1,
-          frequency_penalty: 0,
-          presence_penalty: 0
-        })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error.message || "API Error");
-      }
-
-      const data = await response.json();
-      const content = data.choices?.[0]?.message?.content || "No response";
-      
-      // Update the content response div
-      const outputDiv = document.getElementById("contentResponse");
-      if (outputDiv) {
-        outputDiv.innerHTML = `<strong>Generated with Microsoft Azure AI Studio</strong><br>${content}`;
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      const outputDiv = document.getElementById("contentResponse");
-      if (outputDiv) {
-        outputDiv.innerHTML = `<strong>Error:</strong> ${err.message}`;
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
   useEffect(() => {
     if (!containerRef.current) return;
     
@@ -365,7 +334,8 @@ export default function NASAOceanVR() {
     xrDevice.position.set(0, 1.8, 0);
     
     let scene, camera, renderer, controls;
-    let earth, aquaSat, particles;
+    let earth, moon, aquaSat, particles;
+    let jupiter, venus, uranus, mercury, neptune, saturn, mars; // Add mars ref
     let planets = {}; // Store all planets
     let labels = []; // Store all labels
     let clickableObjects = []; // Store all clickable objects
@@ -524,7 +494,7 @@ export default function NASAOceanVR() {
       // Custom click handlers for specific objects
       // Earth
       if (targetObj.userData?.name === 'Earth') {
-        restoreEarthTexture();
+        restoreEarthTexture(earth);
       }
       if (targetObj.userData?.name === 'Sun') {
         // DO SOMETHING
@@ -535,7 +505,7 @@ export default function NASAOceanVR() {
         // DO SOMETHING FOR SATELLITE
         // Change Earth Texture for Ocean temperature
         // ecco2_and_grid_web.png
-        changeEarthTexture('/assets/imgs/ecco2_and_grid_web.png');
+        changeEarthTexture(earth, '/assets/imgs/ecco2_and_grid_web.png', textureLoader);
       }
     }
     
@@ -870,63 +840,6 @@ export default function NASAOceanVR() {
       animate();
     }
     
-    function changeEarthTexture(newTexturePath) {
-  if (!planets.Earth) {
-    console.warn('Earth not found');
-    return;
-  }
-  
-  const textureLoader = new THREE.TextureLoader();
-  
-  textureLoader.load(
-    newTexturePath,
-    (newTexture) => {
-      // Successfully loaded new texture
-      const newMaterial = new THREE.MeshLambertMaterial({ 
-        map: newTexture
-      });
-      
-      // Store original material if not already stored
-      if (!planets.Earth.userData.originalMaterial) {
-        planets.Earth.userData.originalMaterial = planets.Earth.material.clone();
-      }
-      
-      // Apply new material
-      planets.Earth.material = newMaterial;
-      planets.Earth.material.needsUpdate = true;
-      
-      console.log('Earth texture changed to ocean temperature data');
-    },
-    undefined,
-    (error) => {
-      console.error('Failed to load ocean temperature texture:', error);
-      // Optionally fallback to a colored material representing ocean temperature
-      const fallbackMaterial = new THREE.MeshLambertMaterial({ 
-        color: 0x4169E1, // Royal blue for ocean
-        emissive: 0x001122,
-        emissiveIntensity: 0.3
-      });
-      
-      if (!planets.Earth.userData.originalMaterial) {
-        planets.Earth.userData.originalMaterial = planets.Earth.material.clone();
-      }
-      
-      planets.Earth.material = fallbackMaterial;
-      planets.Earth.material.needsUpdate = true;
-      
-      console.log('Applied fallback ocean temperature visualization');
-    }
-  );
-}
-
-// Optional: Function to restore original Earth texture
-function restoreEarthTexture() {
-  if (planets.Earth && planets.Earth.userData.originalMaterial) {
-    planets.Earth.material = planets.Earth.userData.originalMaterial;
-    planets.Earth.material.needsUpdate = true;
-    console.log('Earth texture restored to original');
-  }
-}
     // ===============================
     // BALANCED LIGHTING SETUP
     // ===============================
@@ -997,22 +910,9 @@ function restoreEarthTexture() {
     // ===============================
     // SOLAR SYSTEM PLANETS WITH TEXTURES
     // ===============================
-    const planetData = [
-      { name: 'Mercury', radius: 1.5, position: [35, 0, 0], texture: '/assets/imgs/mercury.jpg' },
-      { name: 'Venus', radius: 2.3, position: [-45, 10, 15], texture: '/assets/imgs/venus.jpg' },
-      { name: 'Earth', radius: 2.5, position: [0, 0, 55], texture: '/assets/imgs/earth.jpg' },
-      { name: 'Mars', radius: 2.0, position: [50, -15, -50], texture: '/assets/imgs/mars.jpg' },
-      { name: 'Jupiter', radius: 8, position: [-70, 20, -70], texture: '/assets/imgs/jupiter.jpg' },
-      { name: 'Saturn', radius: 7, position: [100, -10, 90], texture: '/assets/imgs/saturn.jpg', hasRings: true },
-      { name: 'Uranus', radius: 4, position: [-120, 25, 100], texture: '/assets/imgs/uranus.jpg' },
-      { name: 'Neptune', radius: 4, position: [140, -20, -140], texture: '/assets/imgs/neptune.jpg' }
-    ];
-
     const textureLoader = new THREE.TextureLoader();
+    const sunGeometry = new THREE.SphereGeometry(12, 32, 32);
 
-    // Add Sun at center with texture
-    const sunGeometry = new THREE.SphereGeometry(12, 64, 64);
-    
     // Load sun texture
     textureLoader.load(
       '/assets/imgs/sun.jpg',
@@ -1056,255 +956,101 @@ function restoreEarthTexture() {
       }
     );
     
-    // Create planets with textures
-    planetData.forEach((planetInfo) => {
-      const geometry = new THREE.SphereGeometry(planetInfo.radius, 32, 32);
-      
-      // Planet color mapping for labels
-      const planetColors = {
-        'Mercury': '#8C7853',
-        'Venus': '#FFC649',
-        'Earth': '#6B93D6',
-        'Mars': '#CD5C5C',
-        'Jupiter': '#D8CA9D',
-        'Saturn': '#FAD5A5',
-        'Uranus': '#4FD0E7',
-        'Neptune': '#4B70DD'
-      };
-      
-      // Load planet texture
-      textureLoader.load(
-        planetInfo.texture,
-        (texture) => {
-          const material = new THREE.MeshLambertMaterial({ 
-            map: texture
-          });
-          
-          const planet = new THREE.Mesh(geometry, material);
-          planet.position.set(planetInfo.position[0], planetInfo.position[1], planetInfo.position[2]);
-          planet.userData = { 
-            name: planetInfo.name, 
-            rotationSpeed: Math.random() * 0.01 + 0.002
-          };
-          
-          scene.add(planet);
-          planets[planetInfo.name] = planet;
-          
-          // Add to clickable objects
-          addClickableObject(planet);
-          
-          // Store Earth reference
-          if (planetInfo.name === 'Earth') {
-            earth = planet;
-            // Load satellite after Earth is created
-            loadSatelliteNearEarth();
-          }
-          
-          // Create label for planet
-          const color = planetColors[planetInfo.name] || '#ffffff';
-          createLabel(`${planetInfo.name}`, planet.position, color);
-          
-          // Add rings to Saturn
-          if (planetInfo.hasRings && planetInfo.name === 'Saturn') {
-            // Load Saturn rings texture
-            textureLoader.load(
-              '/assets/imgs/saturn_rings.png',
-              (ringTexture) => {
-                const ringGeometry = new THREE.RingGeometry(planetInfo.radius + 1, planetInfo.radius + 3, 64);
-                const ringMaterial = new THREE.MeshBasicMaterial({ 
-                  map: ringTexture,
-                  side: THREE.DoubleSide,
-                  transparent: true,
-                  opacity: 0.8
-                });
-                const rings = new THREE.Mesh(ringGeometry, ringMaterial);
-                rings.rotation.x = Math.PI / 2;
-                planet.add(rings);
-              },
-              undefined,
-              (error) => {
-                // Fallback rings without texture
-                const ringGeometry = new THREE.RingGeometry(planetInfo.radius + 1, planetInfo.radius + 3, 64);
-                const ringMaterial = new THREE.MeshBasicMaterial({ 
-                  color: 0xC4A484, 
-                  side: THREE.DoubleSide,
-                  transparent: true,
-                  opacity: 0.6
-                });
-                const rings = new THREE.Mesh(ringGeometry, ringMaterial);
-                rings.rotation.x = Math.PI / 2;
-                planet.add(rings);
-              }
-            );
-          }
-        },
-        undefined,
-        (error) => {
-          // Fallback to colored material
-          const fallbackColors = {
-            'Mercury': 0x8C7853,
-            'Venus': 0xFFC649,
-            'Earth': 0x6B93D6,
-            'Mars': 0xCD5C5C,
-            'Jupiter': 0xD8CA9D,
-            'Saturn': 0xFAD5A5,
-            'Uranus': 0x4FD0E7,
-            'Neptune': 0x4B70DD
-          };
-          
-          const material = new THREE.MeshLambertMaterial({ 
-            color: fallbackColors[planetInfo.name] || 0x888888
-          });
-          
-          const planet = new THREE.Mesh(geometry, material);
-          planet.position.set(planetInfo.position[0], planetInfo.position[1], planetInfo.position[2]);
-          planet.userData = { 
-            name: planetInfo.name, 
-            rotationSpeed: Math.random() * 0.01 + 0.002
-          };
-          
-          scene.add(planet);
-          planets[planetInfo.name] = planet;
-          
-          // Add to clickable objects
-          addClickableObject(planet);
-          
-          // Store Earth reference
-          if (planetInfo.name === 'Earth') {
-            earth = planet;
-            loadSatelliteNearEarth();
-          }
-          
-          // Create label for planet
-          const color = planetColors[planetInfo.name] || '#ffffff';
-          createLabel(`${planetInfo.name}`, planet.position, color);
-          
-          // Add fallback rings to Saturn
-          if (planetInfo.hasRings && planetInfo.name === 'Saturn') {
-            const ringGeometry = new THREE.RingGeometry(planetInfo.radius + 1, planetInfo.radius + 3, 64);
-            const ringMaterial = new THREE.MeshBasicMaterial({ 
-              color: 0xC4A484, 
-              side: THREE.DoubleSide,
-              transparent: true,
-              opacity: 0.6
-            });
-            const rings = new THREE.Mesh(ringGeometry, ringMaterial);
-            rings.rotation.x = Math.PI / 2;
-            planet.add(rings);
-          }
+    // Create Earth and Moon
+    createEarth(textureLoader, scene, addClickableObject, createLabel)
+      .then((earthMesh) => {
+        earth = earthMesh;
+        planets.Earth = earth;
+        
+        return createMoon(textureLoader, scene, earth, addClickableObject, createLabel);
+      })
+      .then((moonMesh) => {
+        moon = moonMesh;
+        if (moon) {
+          planets.Moon = moon;
         }
-      );
-    });
-    
-    // ===============================
-    // SATELLITE 3D MODEL (NEAR EARTH)
-    // ===============================
-    function loadSatelliteNearEarth() {
-      const gltfLoader = new GLTFLoader();
-      gltfLoader.load(
-        '/assets/3Dmodels/nasa_aqua_eos_pm-1_satellite.glb',
-        (gltf) => {
-          aquaSat = gltf.scene;
-          
-          // Enhanced satellite material for better visibility
-          aquaSat.traverse((child) => {
-            if (child.isMesh) {
-              if (child.material) {
-                // Brighter enhancement for satellite
-                child.material.emissive = new THREE.Color(0x333333);
-                child.material.emissiveIntensity = 0.6;
-                child.material.needsUpdate = true;
-                
-                // Higher brightness enhancement
-                if (child.material.color) {
-                  child.material.color.multiplyScalar(2.0);
-                }
-              }
-            }
-          });
-          
-          // Center the model
-          const box = new THREE.Box3().setFromObject(aquaSat);
-          const center = box.getCenter(new THREE.Vector3());
-          aquaSat.position.sub(center);
-          
-          // Position near Earth
-          if (earth) {
-            const earthPos = earth.position.clone();
-            aquaSat.position.set(
-              earthPos.x + 8,
-              earthPos.y + 3,
-              earthPos.z + 5
-            );
-          } else {
-            aquaSat.position.set(8, 3, 60);
-          }
-          
-          // Scale the model
-          aquaSat.scale.set(2, 2, 2);
-          
-          aquaSat.userData = { 
-            name: 'AquaSat',
-            rotationSpeed: 0.002,
-            isSatellite: true
-          };
-          
-          scene.add(aquaSat);
-          
-          // Add to clickable objects
-          addClickableObject(aquaSat);
-          
-          // Create label for satellite
-          createLabel('Aqua Satellite', aquaSat.position, '#00aaff');
-          
-          setLoading(false);
-        },
-        (progress) => {
-          // Loading progress removed
-        },
-        (error) => {
-          // Create brighter fallback satellite
-          const fallbackGeometry = new THREE.SphereGeometry(1, 16, 16);
-          const fallbackMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0x00aaff,
-            emissive: 0x0066aa,
-            emissiveIntensity: 0.8
-          });
-          aquaSat = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
-          
-          if (earth) {
-            const earthPos = earth.position.clone();
-            aquaSat.position.set(earthPos.x + 8, earthPos.y + 3, earthPos.z + 5);
-          } else {
-            aquaSat.position.set(8, 3, 60);
-          }
-          
-          aquaSat.userData = { 
-            name: 'AquaSat',
-            rotationSpeed: 0.002,
-            isSatellite: true
-          };
-          
-          scene.add(aquaSat);
-          
-          // Add to clickable objects
-          addClickableObject(aquaSat);
-          
-          // Create label for fallback satellite
-          createLabel('Aqua Satellite', aquaSat.position, '#00aaff');
-          
-          setLoading(false);
-        }
-      );
-    }
-    
-    // ADD EVENT LISTENERS AFTER A DELAY TO ENSURE OBJECTS ARE LOADED
-    setTimeout(() => {
-      // Add event listeners
-      renderer.domElement.addEventListener('click', handleClick);
-      renderer.domElement.addEventListener('mousemove', handleMouseMove);
-    }, 2000); // Wait 2 seconds for objects to load
-    
+        
+        // Load satellite after Earth and Moon are created
+        return loadAquaSatellite(scene, earth, addClickableObject, createLabel, setLoading);
+      })
+      .then((satelliteMesh) => {
+        aquaSat = satelliteMesh;
+        planets.AquaSat = aquaSat;
+      })
+      .catch((error) => {
+        console.error('Error creating Earth, Moon, or Satellite:', error);
+      });
+
+    // Create Mercury
+    createMercury(textureLoader, scene, addClickableObject, createLabel)
+      .then((mercuryMesh) => {
+        mercury = mercuryMesh;
+        planets.Mercury = mercury;
+      })
+      .catch((error) => {
+        console.error('Error creating Mercury:', error);
+      });
+
+    // Create Venus
+    createVenus(textureLoader, scene, addClickableObject, createLabel)
+      .then((venusMesh) => {
+        venus = venusMesh;
+        planets.Venus = venus;
+      })
+      .catch((error) => {
+        console.error('Error creating Venus:', error);
+      });
+
+    // Create Mars
+    createMars(textureLoader, scene, addClickableObject, createLabel)
+      .then((marsMesh) => {
+        mars = marsMesh;
+        planets.Mars = mars;
+      })
+      .catch((error) => {
+        console.error('Error creating Mars:', error);
+      });
+
+    // Create Jupiter
+    createJupiter(textureLoader, scene, addClickableObject, createLabel)
+      .then((jupiterMesh) => {
+        jupiter = jupiterMesh;
+        planets.Jupiter = jupiter;
+      })
+      .catch((error) => {
+        console.error('Error creating Jupiter:', error);
+      });
+
+    // Create Saturn
+    createSaturn(textureLoader, scene, addClickableObject, createLabel)
+      .then((saturnMesh) => {
+        saturn = saturnMesh;
+        planets.Saturn = saturn;
+      })
+      .catch((error) => {
+        console.error('Error creating Saturn:', error);
+      });
+
+    // Create Uranus
+    createUranus(textureLoader, scene, addClickableObject, createLabel)
+      .then((uranusMesh) => {
+        uranus = uranusMesh;
+        planets.Uranus = uranus;
+      })
+      .catch((error) => {
+        console.error('Error creating Uranus:', error);
+      });
+
+    // Create Neptune
+    createNeptune(textureLoader, scene, addClickableObject, createLabel)
+      .then((neptuneMesh) => {
+        neptune = neptuneMesh;
+        planets.Neptune = neptune;
+      })
+      .catch((error) => {
+        console.error('Error creating Neptune:', error);
+      });
+
     // ===============================
     // ANIMATION LOOP
     // ===============================
@@ -1319,16 +1065,20 @@ function restoreEarthTexture() {
         planets.Sun.rotation.y += planets.Sun.userData.rotationSpeed;
       }
       
-      // Animate planets (only rotation, no orbital movement)
-      Object.values(planets).forEach(planet => {
-        if (planet.userData && planet.userData.rotationSpeed) {
-          planet.rotation.y += planet.userData.rotationSpeed;
-        }
-      });
+      // Animate all modular planets
+      if (earth) animateEarth(earth);
+      if (moon) animateMoon(moon);
+      if (mercury) animateMercury(mercury);
+      if (venus) animateVenus(venus);
+      if (mars) animateMars(mars);
+      if (jupiter) animateJupiter(jupiter);
+      if (saturn) animateSaturn(saturn);
+      if (uranus) animateUranus(uranus);
+      if (neptune) animateNeptune(neptune);
       
-      // Rotate satellite slowly
-      if (aquaSat && aquaSat.userData) {
-        aquaSat.rotation.y += aquaSat.userData.rotationSpeed;
+      // Animate satellite
+      if (aquaSat) {
+        animateAquaSatellite(aquaSat);
       }
       
       // Subtle particle movement
@@ -1499,19 +1249,67 @@ function restoreEarthTexture() {
             
             {selectedObject === 'Earth' && (
               <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(0,100,200,0.2)', borderRadius: '3px', fontSize: '10px' }}>
-                🌍 Third planet • Only known planet with life • 71% water coverage
+                {EARTH_CONFIG.info.emoji} {EARTH_CONFIG.info.description}
               </div>
             )}
             
-            {selectedObject === 'AquaSat' && (
-              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(0,170,255,0.2)', borderRadius: '3px', fontSize: '10px' }}>
-                🛰️ Monitors Earth's water cycle • Launched 2002 • Studies ocean temperature
+            {selectedObject === 'Moon' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(200,200,200,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                {MOON_CONFIG.info.emoji} {MOON_CONFIG.info.description}
+              </div>
+            )}
+            
+            {selectedObject === 'Jupiter' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(216,202,157,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                {JUPITER_CONFIG.info.emoji} {JUPITER_CONFIG.info.description}
+              </div>
+            )}
+            
+            {selectedObject === 'Venus' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(255,198,73,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                {VENUS_CONFIG.info.emoji} {VENUS_CONFIG.info.description}
+              </div>
+            )}
+            
+            {selectedObject === 'Uranus' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(79,208,231,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                {URANUS_CONFIG.info.emoji} {URANUS_CONFIG.info.description}
+              </div>
+            )}
+            
+            {selectedObject === 'Saturn' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(250,213,165,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                {SATURN_CONFIG.info.emoji} {SATURN_CONFIG.info.description}
+              </div>
+            )}
+            
+            {selectedObject === 'Neptune' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(75,112,221,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                {NEPTUNE_CONFIG.info.emoji} {NEPTUNE_CONFIG.info.description}
               </div>
             )}
             
             {selectedObject === 'Sun' && (
               <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(255,215,0,0.2)', borderRadius: '3px', fontSize: '10px' }}>
                 ☀️ Center of solar system • 99.86% of system's mass • Powers life on Earth
+              </div>
+            )}
+            
+            {selectedObject === 'Mercury' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(140,120,83,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                {MERCURY_CONFIG.info.emoji} {MERCURY_CONFIG.info.description}
+              </div>
+            )}
+            
+            {selectedObject === 'Mars' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(205,92,92,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                {MARS_CONFIG.info.emoji} {MARS_CONFIG.info.description}
+              </div>
+            )}
+            
+            {selectedObject === 'AquaSat' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(0,170,255,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                {AQUA_SAT_CONFIG.info.emoji} {AQUA_SAT_CONFIG.info.description}
               </div>
             )}
           </div>
@@ -1540,7 +1338,7 @@ function restoreEarthTexture() {
           <button 
             onClick={() => {
               if (selectedObject && userInput.trim()) {
-                callAzureOpenAI(userInput);
+                handleAzureOpenAICall(userInput);
               }
             }}
             disabled={!selectedObject || !userInput.trim() || isLoading}
