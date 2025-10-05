@@ -1403,7 +1403,7 @@ function restoreEarthTexture() {
               </div>
             )}
             
-            {selectedObject === 'AquaSat' && (
+            {  selectedObject.startsWith('Object_') && (
               <div style={{ marginTop: '10px', padding: '8px', backgroundColor: 'rgba(0,170,255,0.2)', borderRadius: '5px' }}>
                 🛰️ <strong>Aqua Satellite:</strong><br/>
                 • Monitors Earth's water cycle<br/>
@@ -1438,7 +1438,7 @@ function restoreEarthTexture() {
               width: '100%'
             }}
           >
-            Close
+            Click to speak with Astronaut about {selectedObject}
           </button>
         </div>
       )}
