@@ -28,6 +28,8 @@ export default function NASAOceanVR() {
     let planets = {}; // Store all planets
     let labels = []; // Store all labels
     let clickableObjects = []; // Store all clickable objects
+    let hoveredObject = null; // Track currently hovered object
+    let originalMaterials = new Map(); // Store original materials for glow effect
     
     // Scene setup
     scene = new THREE.Scene();
@@ -66,7 +68,6 @@ export default function NASAOceanVR() {
     // Function to add object to clickable objects array
     function addClickableObject(object) {
       clickableObjects.push(object);
-      console.log(`Added ${object.userData?.name || 'Unknown'} to clickable objects. Total: ${clickableObjects.length}`);
     }
     
     // Function to handle mouse position calculation
@@ -74,7 +75,6 @@ export default function NASAOceanVR() {
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      console.log('Mouse position updated:', mouse.x, mouse.y);
     }
     
     // Function to get intersected objects
@@ -97,15 +97,73 @@ export default function NASAOceanVR() {
         }
       });
       
-      console.log(`Checking ${objectsToCheck.length} objects for intersection`);
       const intersects = raycaster.intersectObjects(objectsToCheck, false);
-      console.log(`Found ${intersects.length} intersections`);
       return intersects;
+    }
+    
+    // Function to add glow effect to object
+    function addGlowEffect(object) {
+      // Find the main mesh to apply glow to
+      let targetMesh = object;
+      if (!object.isMesh && object.children.length > 0) {
+        // For groups, find the first mesh
+        object.traverse((child) => {
+          if (child.isMesh && !targetMesh.isMesh) {
+            targetMesh = child;
+          }
+        });
+      }
+      
+      if (targetMesh.isMesh && targetMesh.material) {
+        // Store original material if not already stored
+        if (!originalMaterials.has(targetMesh)) {
+          originalMaterials.set(targetMesh, targetMesh.material.clone());
+        }
+        
+        // Apply glow effect
+        if (targetMesh.material.emissive) {
+          targetMesh.material.emissive.setHex(0x444444);
+          targetMesh.material.emissiveIntensity = 0.5;
+        }
+        
+        // Add subtle scale effect
+        if (!targetMesh.userData.originalScale) {
+          targetMesh.userData.originalScale = targetMesh.scale.clone();
+        }
+        targetMesh.scale.multiplyScalar(1.05);
+      }
+    }
+    
+    // Function to remove glow effect from object
+    function removeGlowEffect(object) {
+      // Find the main mesh to remove glow from
+      let targetMesh = object;
+      if (!object.isMesh && object.children.length > 0) {
+        // For groups, find the first mesh
+        object.traverse((child) => {
+          if (child.isMesh && !targetMesh.isMesh) {
+            targetMesh = child;
+          }
+        });
+      }
+      
+      if (targetMesh.isMesh && originalMaterials.has(targetMesh)) {
+        // Restore original material properties
+        const originalMaterial = originalMaterials.get(targetMesh);
+        if (targetMesh.material.emissive && originalMaterial.emissive) {
+          targetMesh.material.emissive.copy(originalMaterial.emissive);
+          targetMesh.material.emissiveIntensity = originalMaterial.emissiveIntensity || 0;
+        }
+        
+        // Restore original scale
+        if (targetMesh.userData.originalScale) {
+          targetMesh.scale.copy(targetMesh.userData.originalScale);
+        }
+      }
     }
     
     // Function to handle object clicks
     function handleObjectClick(intersectedObject) {
-      console.log('handleObjectClick called with:', intersectedObject);
       
       // Find the parent object (in case we clicked a child mesh)
       let targetObj = intersectedObject;
@@ -118,12 +176,22 @@ export default function NASAOceanVR() {
       });
       
       console.log('Clicked object:', targetObj.userData?.name || 'Unknown');
-      // Add a condition to check THE OBJECT clicked
       
       // Custom click handlers for specific objects
+      // Earth
+      if (targetObj.userData?.name === 'Earth') {
+        restoreEarthTexture();
+      }
       if (targetObj.userData?.name === 'Sun') {
-        console.log("Sun clicked - DO SOMETHING SPECIAL");
-        // Example: change emission for feedback
+        // DO SOMETHING
+        
+      }
+      // Satellite
+      if (targetObj.userData?.name.startsWith('Object_')) {
+        // DO SOMETHING SPECIAL FOR SATELLITE
+        // Change Earth Texture for Ocean temperature
+        // ecco2_and_grid_web.png
+        changeEarthTexture('/assets/imgs/ecco2_and_grid_web.png');
       }
     }
     
@@ -135,30 +203,38 @@ export default function NASAOceanVR() {
       // Reset cursor
       document.body.style.cursor = 'default';
       
+      // Remove glow from previously hovered object
+      if (hoveredObject) {
+        removeGlowEffect(hoveredObject);
+        hoveredObject = null;
+      }
+      
       if (intersects.length > 0) {
         // Change cursor to pointer when hovering over clickable objects
         document.body.style.cursor = 'pointer';
-        console.log('Hovering over:', intersects[0].object.userData?.name || 'Unknown object');
         
-        // Optional: Add hover effects here
-        const hoveredObject = intersects[0].object;
-        // You could add glow effects, scale changes, etc.
+        // Find the parent clickable object
+        let targetObj = intersects[0].object;
+        clickableObjects.forEach(clickableObj => {
+          if (clickableObj.children.includes(intersects[0].object) || clickableObj === intersects[0].object) {
+            targetObj = clickableObj;
+          }
+        });
+        
+        // Apply glow effect to hovered object
+        hoveredObject = targetObj;
+        addGlowEffect(hoveredObject);
       }
     }
     
     // Click event handler
     function handleClick(event) {
-      console.log('Click event triggered');
-      console.log('Clickable objects array length:', clickableObjects.length);
-      
       updateMousePosition(event);
       const intersects = getIntersectedObjects();
       
       if (intersects.length > 0) {
-        console.log('Click intersected with object');
         handleObjectClick(intersects[0].object);
       } else {
-        console.log('Click on empty space');
         // Clicked on empty space - exit zoom mode
         if (zoomModeRef.current) {
           zoomOutOfObject();
@@ -187,7 +263,7 @@ export default function NASAOceanVR() {
       context.clearRect(0, 0, canvas.width, canvas.height);
       
       // Draw background rectangle
-      context.fillStyle = 'rgba(0, 0, 0, 0.8)'; // Slightly more opaque background
+      context.fillStyle = 'rgba(0, 0, 0, 1)'; // Slightly more opaque background
       
       context.roundRect = function(x, y, w, h, r) {
         this.beginPath();
@@ -215,13 +291,13 @@ export default function NASAOceanVR() {
       const texture = new THREE.CanvasTexture(canvas);
       texture.needsUpdate = true;
       
-      // Create sprite material
+      // Create sprite material with proper depth testing
       const spriteMaterial = new THREE.SpriteMaterial({ 
         map: texture,
         transparent: true,
-        opacity: 1.0, // Full opacity
-        depthTest: false, // Don't hide behind objects
-        depthWrite: false // Don't write to depth buffer
+        opacity: 1.0,
+        depthTest: true, // Enable depth testing so labels respect object depth
+        depthWrite: false // Don't write to depth buffer to avoid interfering with other objects
       });
       
       // Create sprite
@@ -241,8 +317,8 @@ export default function NASAOceanVR() {
         isLabel: true // Mark as label for identification
       };
       
-      // Render order to ensure labels appear on top
-      sprite.renderOrder = 1000;
+      // Lower render order so objects can appear in front of labels when appropriate
+      sprite.renderOrder = 100;
       
       scene.add(sprite);
       labels.push(sprite);
@@ -274,6 +350,24 @@ export default function NASAOceanVR() {
         // Scale labels based on distance for better readability
         const baseScale = Math.max(8, distanceToCamera * 0.08);
         label.scale.set(baseScale, baseScale * 0.25, 1);
+        
+        // Hide labels when zoomed very close to avoid overlap issues
+        if (distanceToCamera < 5) {
+          label.visible = false;
+        } else {
+          label.visible = true;
+        }
+        
+        // Adjust opacity based on distance to make labels fade when very close
+        const minDistance = 15;
+        const maxDistance = 100;
+        if (distanceToCamera < maxDistance) {
+          const fadeDistance = Math.max(minDistance, distanceToCamera);
+          const opacity = (fadeDistance - minDistance) / (maxDistance - minDistance);
+          label.material.opacity = Math.max(0.3, Math.min(1.0, opacity));
+        } else {
+          label.material.opacity = 1.0;
+        }
       });
     }
     
@@ -285,11 +379,9 @@ export default function NASAOceanVR() {
     let originalMinDistance = 0.1;
     let originalMaxDistance = 200;
 
-    // Function to zoom into object
+    // Function to zoom into object - FIXED VERSION
     function zoomIntoObject(object) {
       if (!object || zoomModeRef.current) return;
-      
-      console.log('Zooming into object:', object.userData?.name || 'Unknown');
       
       // Store original camera settings
       originalCameraPosition.copy(camera.position);
@@ -305,26 +397,85 @@ export default function NASAOceanVR() {
       setZoomMode(true);
       setTargetObject(object);
       
-      // Calculate new camera position
-      const objectPosition = object.position.clone();
-      const boundingBox = new THREE.Box3().setFromObject(object);
-      const size = boundingBox.getSize(new THREE.Vector3());
-      const maxDimension = Math.max(size.x, size.y, size.z);
+      // Get object position - handle both single meshes and groups
+      let objectPosition = object.position.clone();
+      let objectSize = 1; // Default size
       
-      // Position camera in front of object
-      const distance = maxDimension * 3; // 3x the object size
-      const newCameraPosition = objectPosition.clone();
-      newCameraPosition.z += distance;
+      // Calculate bounding box more reliably
+      try {
+        const boundingBox = new THREE.Box3();
+        
+        // For groups (like satellite), we need to update world matrix first
+        if (object.children && object.children.length > 0) {
+          object.updateMatrixWorld(true);
+          boundingBox.setFromObject(object);
+        } else {
+          // For single meshes
+          object.updateMatrixWorld(true);
+          boundingBox.setFromObject(object);
+        }
+        
+        const size = boundingBox.getSize(new THREE.Vector3());
+        objectSize = Math.max(size.x, size.y, size.z);
+        
+        // If bounding box calculation failed or returned invalid size
+        if (!isFinite(objectSize) || objectSize <= 0) {
+          // Fallback based on object type
+          if (object.userData?.name === 'Sun') {
+            objectSize = 24; // Sun diameter
+          } else if (object.userData?.name === 'AquaSat') {
+            objectSize = 4; // Satellite approximate size
+          } else if (object.userData?.name === 'Jupiter') {
+            objectSize = 16; // Jupiter diameter
+          } else if (object.userData?.name === 'Saturn') {
+            objectSize = 14; // Saturn diameter
+          } else {
+            objectSize = 5; // Default planet size
+          }
+        }
+      } catch (error) {
+        console.warn('Bounding box calculation failed, using fallback size', error);
+        // Fallback sizes based on object name
+        if (object.userData?.name === 'Sun') {
+          objectSize = 24;
+        } else if (object.userData?.name === 'AquaSat') {
+          objectSize = 4;
+        } else if (object.userData?.name === 'Jupiter') {
+          objectSize = 16;
+        } else if (object.userData?.name === 'Saturn') {
+          objectSize = 14;
+        } else {
+          objectSize = 5;
+        }
+      }
       
-      // Animate camera to new position
-      animateCamera(newCameraPosition, objectPosition, distance * 0.5, distance * 5);
+      // Calculate new camera position with better distance calculation
+      const distance = Math.max(objectSize * 2.5, 10); // Minimum distance of 10
+      
+      // Position camera in front of object (along Z-axis from object's perspective)
+      const cameraOffset = new THREE.Vector3(0, 0, distance);
+      
+      // If object is very far from origin, approach from current camera direction
+      const objectDistanceFromOrigin = objectPosition.length();
+      if (objectDistanceFromOrigin > 50) {
+        // Calculate direction from camera to object
+        const directionToObject = objectPosition.clone().sub(camera.position).normalize();
+        const newCameraPosition = objectPosition.clone().sub(directionToObject.multiplyScalar(distance));
+        
+        // Animate camera to new position
+        animateCamera(newCameraPosition, objectPosition, distance * 0.3, distance * 3);
+      } else {
+        // For objects closer to origin, use standard offset
+        const newCameraPosition = objectPosition.clone().add(cameraOffset);
+        
+        // Animate camera to new position
+        animateCamera(newCameraPosition, objectPosition, distance * 0.3, distance * 3);
+      }
     }
 
     // Function to zoom out of object
     function zoomOutOfObject() {
       if (!zoomModeRef.current) return;
-      
-      console.log('Zooming out of object');
       
       // Update refs first
       zoomModeRef.current = false;
@@ -374,6 +525,63 @@ export default function NASAOceanVR() {
       animate();
     }
     
+    function changeEarthTexture(newTexturePath) {
+  if (!planets.Earth) {
+    console.warn('Earth not found');
+    return;
+  }
+  
+  const textureLoader = new THREE.TextureLoader();
+  
+  textureLoader.load(
+    newTexturePath,
+    (newTexture) => {
+      // Successfully loaded new texture
+      const newMaterial = new THREE.MeshLambertMaterial({ 
+        map: newTexture
+      });
+      
+      // Store original material if not already stored
+      if (!planets.Earth.userData.originalMaterial) {
+        planets.Earth.userData.originalMaterial = planets.Earth.material.clone();
+      }
+      
+      // Apply new material
+      planets.Earth.material = newMaterial;
+      planets.Earth.material.needsUpdate = true;
+      
+      console.log('Earth texture changed to ocean temperature data');
+    },
+    undefined,
+    (error) => {
+      console.error('Failed to load ocean temperature texture:', error);
+      // Optionally fallback to a colored material representing ocean temperature
+      const fallbackMaterial = new THREE.MeshLambertMaterial({ 
+        color: 0x4169E1, // Royal blue for ocean
+        emissive: 0x001122,
+        emissiveIntensity: 0.3
+      });
+      
+      if (!planets.Earth.userData.originalMaterial) {
+        planets.Earth.userData.originalMaterial = planets.Earth.material.clone();
+      }
+      
+      planets.Earth.material = fallbackMaterial;
+      planets.Earth.material.needsUpdate = true;
+      
+      console.log('Applied fallback ocean temperature visualization');
+    }
+  );
+}
+
+// Optional: Function to restore original Earth texture
+function restoreEarthTexture() {
+  if (planets.Earth && planets.Earth.userData.originalMaterial) {
+    planets.Earth.material = planets.Earth.userData.originalMaterial;
+    planets.Earth.material.needsUpdate = true;
+    console.log('Earth texture restored to original');
+  }
+}
     // ===============================
     // BALANCED LIGHTING SETUP
     // ===============================
@@ -479,11 +687,10 @@ export default function NASAOceanVR() {
         addClickableObject(sun);
         
         // Create label for Sun
-        createLabel('☀️ Sun', sun.position, '#FFD700');
+        createLabel('Sun', sun.position, '#FFD700');
       },
       undefined,
       (error) => {
-        console.error('Error loading sun texture:', error);
         // Fallback sun material without texture
         const sunMaterial = new THREE.MeshBasicMaterial({ 
           color: 0xFFD700,
@@ -500,7 +707,7 @@ export default function NASAOceanVR() {
         addClickableObject(sun);
         
         // Create label for Sun
-        createLabel('☀️ Sun', sun.position, '#FFD700');
+        createLabel('Sun', sun.position, '#FFD700');
       }
     );
     
@@ -550,7 +757,7 @@ export default function NASAOceanVR() {
           
           // Create label for planet
           const color = planetColors[planetInfo.name] || '#ffffff';
-          createLabel(`🪐 ${planetInfo.name}`, planet.position, color);
+          createLabel(`${planetInfo.name}`, planet.position, color);
           
           // Add rings to Saturn
           if (planetInfo.hasRings && planetInfo.name === 'Saturn') {
@@ -571,7 +778,6 @@ export default function NASAOceanVR() {
               },
               undefined,
               (error) => {
-                console.error('Error loading Saturn rings texture:', error);
                 // Fallback rings without texture
                 const ringGeometry = new THREE.RingGeometry(planetInfo.radius + 1, planetInfo.radius + 3, 64);
                 const ringMaterial = new THREE.MeshBasicMaterial({ 
@@ -589,7 +795,6 @@ export default function NASAOceanVR() {
         },
         undefined,
         (error) => {
-          console.error(`Error loading texture for ${planetInfo.name}:`, error);
           // Fallback to colored material
           const fallbackColors = {
             'Mercury': 0x8C7853,
@@ -627,7 +832,7 @@ export default function NASAOceanVR() {
           
           // Create label for planet
           const color = planetColors[planetInfo.name] || '#ffffff';
-          createLabel(`🪐 ${planetInfo.name}`, planet.position, color);
+          createLabel(`${planetInfo.name}`, planet.position, color);
           
           // Add fallback rings to Saturn
           if (planetInfo.hasRings && planetInfo.name === 'Saturn') {
@@ -654,8 +859,6 @@ export default function NASAOceanVR() {
       gltfLoader.load(
         '/assets/3Dmodels/nasa_aqua_eos_pm-1_satellite.glb',
         (gltf) => {
-          console.log('Satellite model loaded successfully:', gltf);
-          
           aquaSat = gltf.scene;
           
           // Enhanced satellite material for better visibility
@@ -706,20 +909,15 @@ export default function NASAOceanVR() {
           // Add to clickable objects
           addClickableObject(aquaSat);
           
-          console.log('Satellite added near Earth at position:', aquaSat.position);
-          
           // Create label for satellite
-          createLabel('🛰️ Aqua Satellite', aquaSat.position, '#00aaff');
+          createLabel('Aqua Satellite', aquaSat.position, '#00aaff');
           
           setLoading(false);
         },
         (progress) => {
-          console.log('Loading satellite model:', Math.round(progress.loaded / progress.total * 100) + '%');
+          // Loading progress removed
         },
         (error) => {
-          console.error('Error loading satellite model:', error);
-          console.log('Creating fallback satellite near Earth...');
-          
           // Create brighter fallback satellite
           const fallbackGeometry = new THREE.SphereGeometry(1, 16, 16);
           const fallbackMaterial = new THREE.MeshBasicMaterial({ 
@@ -748,7 +946,7 @@ export default function NASAOceanVR() {
           addClickableObject(aquaSat);
           
           // Create label for fallback satellite
-          createLabel('🛰️ Aqua Satellite', aquaSat.position, '#00aaff');
+          createLabel('Aqua Satellite', aquaSat.position, '#00aaff');
           
           setLoading(false);
         }
@@ -757,14 +955,9 @@ export default function NASAOceanVR() {
     
     // ADD EVENT LISTENERS AFTER A DELAY TO ENSURE OBJECTS ARE LOADED
     setTimeout(() => {
-      console.log('Setting up event listeners...');
-      console.log('Current clickable objects count:', clickableObjects.length);
-      
       // Add event listeners
       renderer.domElement.addEventListener('click', handleClick);
       renderer.domElement.addEventListener('mousemove', handleMouseMove);
-      
-      console.log('Event listeners added!');
     }, 2000); // Wait 2 seconds for objects to load
     
     // ===============================
@@ -826,6 +1019,12 @@ export default function NASAOceanVR() {
       renderer.domElement.removeEventListener('click', handleClick);
       renderer.domElement.removeEventListener('mousemove', handleMouseMove);
       document.body.style.cursor = 'default'; // Reset cursor
+      
+      // Remove glow effect from any currently hovered object
+      if (hoveredObject) {
+        removeGlowEffect(hoveredObject);
+      }
+      
       if (containerRef.current && renderer.domElement) {
         containerRef.current.removeChild(renderer.domElement);
       }
@@ -891,7 +1090,7 @@ export default function NASAOceanVR() {
         💫 Hover: Objects glow when selectable<br/>
         {zoomMode ? 
           '🔍 In zoom mode - click object again to exit or click empty space' : 
-          '☀️ Bright Sun at center, 🪐 Textured planets, 🛰️ Satellite near Earth, ✨ Colorful distant stars'
+          '☀️ Bright Sun at center, 🪐 Textured planets, 🛰️ Aqua Satellite, ✨ Colorful distant stars'
         }
       </div>
       
@@ -908,8 +1107,8 @@ export default function NASAOceanVR() {
         maxWidth: '250px'
       }}>
         <strong>Clickable Objects:</strong><br/>
-        ☀️ Sun (center) | 🪐 Mercury | 🪐 Venus | 🌍 Earth + Aqua satellite<br/>
-        🪐 Mars | 🪐 Jupiter | 🪐 Saturn + Rings | 🪐 Uranus | 🪐 Neptune<br/>
+        Sun (center) |  Mercury |  Venus |  Earth + Aqua satellite<br/>
+       Mars |  Jupiter |  Saturn + Rings |  Uranus |  Neptune<br/>
         Click any object to zoom in and explore!
       </div>
     </div>
