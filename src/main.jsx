@@ -1438,7 +1438,21 @@ function restoreEarthTexture() {
         
       </div>
       
-      
+      <div style={{
+        position: 'absolute',
+        bottom: '10px',
+        left: '10px',
+        color: 'white',
+        background: 'rgba(0,0,0,0.7)',
+        padding: '10px',
+        borderRadius: '5px',
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '12px',
+        maxWidth: '250px'
+      }}>
+        <strong>CIDAK Credits</strong><br/>
+        Add about us section 2025<br/>
+      </div>
       {/* User Input and AI Response Section with Astronaut Scene */}
       <div style={{
         position: 'absolute',
@@ -1458,7 +1472,7 @@ function restoreEarthTexture() {
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
           <div style={{ flex: 1 }}>
             <strong style={{ fontSize: '14px' }}>
-              {selectedObject ? `Ask about ${selectedObject}` : 'Select an object first, then ask...'}
+              {selectedObject ? `Ask about ${selectedObject}` : 'Select an object first, then ask CIDAK Space Explorer'}
             </strong>
           </div>
           
