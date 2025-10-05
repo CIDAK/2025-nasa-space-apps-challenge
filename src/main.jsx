@@ -12,6 +12,8 @@ export default function NASAOceanVR() {
   const [zoomMode, setZoomMode] = useState(false);
   const [targetObject, setTargetObject] = useState(null);
   const [selectedObject, setSelectedObject] = useState(null); // Add this new state
+  const [userInput, setUserInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
   // Add refs to track current state for event handlers
   const zoomModeRef = useRef(false);
@@ -182,7 +184,7 @@ export default function NASAOceanVR() {
         
         
         // Center the astronaut at origin (0, 0, 0)
-        astronaut.position.set(-center.x, -6, -center.z);
+        astronaut.position.set(-1, -3, -center.z);
         
         // Scale to be larger - fill more of the scene
         const maxDimension = Math.max(size.x, size.y, size.z);
@@ -294,6 +296,65 @@ export default function NASAOceanVR() {
     };
   }, [selectedObject]);
   // End astronaut scene setup useEffect
+
+  // API function to call Azure OpenAI
+  const callAzureOpenAI = async (userInput) => {
+    const apiKey = "5Om697To2BJ3g1oVDXiNpEpP0IfO6WwEcojJ4W6Hyms1FR5fYnaAJQQJ99BFACYeBjFXJ3w3AAAAACOG9UkB"; // Replace with your actual API key
+    const endpoint = "https://thinkerforai-azureaifoundry.cognitiveservices.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-01-01-preview"; // Replace with your actual endpoint
+    
+    const messages = [
+      { role: "system", content: `
+         1. You are CIDAK Space Explorer, a space explorer on a mission to gather information about the solar system and the satellite Aqua.
+          2. Your task is to ask the user insightful questions about various celestial bodies, the solar system, and Aqua. You may also inquire about the environment, scientific phenomena, and discoveries related to Aqua.
+          3. When responding, you will always include at least one element of curiosity or exploration. You may focus on topics like the nature of distant planets, the technology used for space exploration, or the mysteries surrounding Aqua.
+          4. You must ensure your responses are scientifically accurate and reflect the context of space exploration and satellite data collection. 
+          5. Always engage the user in a way that sparks further discussion about space, the solar system, and Aqua's role in Earth's climate and ocean monitoring.
+          8. If no valid continuation or question is possible, respond with: "I'm currently analyzing more data; let's return to the wonders of space exploration soon."`
+      },
+      { role: "user", content: `${userInput} about ${selectedObject}` }
+    ];
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": apiKey
+        },
+        body: JSON.stringify({
+          messages: messages,
+          max_tokens: 800,
+          temperature: 1,
+          top_p: 1,
+          frequency_penalty: 0,
+          presence_penalty: 0
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error.message || "API Error");
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || "No response";
+      
+      // Update the content response div
+      const outputDiv = document.getElementById("contentResponse");
+      if (outputDiv) {
+        outputDiv.innerHTML = `<strong>Generated with Microsoft Azure AI Studio</strong><br>${content}`;
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      const outputDiv = document.getElementById("contentResponse");
+      if (outputDiv) {
+        outputDiv.innerHTML = `<strong>Error:</strong> ${err.message}`;
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   useEffect(() => {
     if (!containerRef.current) return;
@@ -457,7 +518,7 @@ export default function NASAOceanVR() {
       
       console.log('Clicked object:', targetObj.userData?.name || 'Unknown');
       
-      // Set the selected object for the overlay
+      // Set the selected object for the AI functionality (instead of overlay)
       setSelectedObject(targetObj.userData?.name || 'Unknown Object');
       
       // Custom click handlers for specific objects
@@ -471,7 +532,7 @@ export default function NASAOceanVR() {
       }
       // Satellite
       if (targetObj.userData?.name.startsWith('Object_')) {
-        // DO SOMETHING SPECIAL FOR SATELLITE
+        // DO SOMETHING FOR SATELLITE
         // Change Earth Texture for Ocean temperature
         // ecco2_and_grid_web.png
         changeEarthTexture('/assets/imgs/ecco2_and_grid_web.png');
@@ -522,7 +583,7 @@ export default function NASAOceanVR() {
         if (zoomModeRef.current) {
           zoomOutOfObject();
         }
-        setSelectedObject(null); // Clear the overlay when clicking empty space
+        setSelectedObject(null); // Clear the selected object when clicking empty space
       }
     }
     
@@ -1355,93 +1416,7 @@ function restoreEarthTexture() {
         </div>
       )}
       
-      {/* Selected Object Overlay with Astronaut Scene */}
-      {selectedObject && (
-        <div style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          color: 'white',
-          background: 'rgba(0,0,0,0.8)',
-          padding: '15px',
-          borderRadius: '10px',
-          fontFamily: 'Arial, sans-serif',
-          fontSize: '14px',
-          maxWidth: '320px',
-          height: 'calc(100vh - 20px)',
-          overflowY: 'auto',
-          border: '2px solid rgba(255,255,255,0.1)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-            <strong style={{ fontSize: '16px' }}>{selectedObject}</strong>
-            
-            {/* Astronaut Scene Corner */}
-            <div 
-              ref={astronautSceneRef}
-              style={{
-                marginLeft: 'auto',
-                width: '120px',
-                height: '120px',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                border: '1px solid rgba(255,255,255,0.2)',
-                backgroundColor: 'rgba(0,0,0,0.5)'
-              }}
-            />
-          </div>
-          
-          <div style={{ fontSize: '12px', opacity: 0.9, lineHeight: '1.4' }}>
-            <p>Click here to learn more about <strong>{selectedObject}</strong> or ask questions about its properties, composition, and characteristics.</p>
-            
-            {selectedObject === 'Earth' && (
-              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: 'rgba(0,100,200,0.2)', borderRadius: '5px' }}>
-                🌍 <strong>Earth Facts:</strong><br/>
-                • Third planet from the Sun<br/>
-                • Only known planet with life<br/>
-                • 71% water surface coverage<br/>
-                • Diameter: 12,742 km
-              </div>
-            )}
-            
-            {  selectedObject.startsWith('Object_') && (
-              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: 'rgba(0,170,255,0.2)', borderRadius: '5px' }}>
-                🛰️ <strong>Aqua Satellite:</strong><br/>
-                • Monitors Earth's water cycle<br/>
-                • Launched in 2002<br/>
-                • Orbits 705 km above Earth<br/>
-                • Studies ocean temperature & clouds
-              </div>
-            )}
-            
-            {selectedObject === 'Sun' && (
-              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: 'rgba(255,215,0,0.2)', borderRadius: '5px' }}>
-                ☀️ <strong>The Sun:</strong><br/>
-                • Center of our solar system<br/>
-                • Contains 99.86% of system's mass<br/>
-                • Surface temperature: 5,778 K<br/>
-                • Powers life on Earth
-              </div>
-            )}
-          </div>
-          
-          <button 
-            onClick={() => setSelectedObject(null)}
-            style={{
-              marginTop: '15px',
-              padding: '8px 16px',
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.3)',
-              borderRadius: '5px',
-              color: 'white',
-              cursor: 'pointer',
-              fontSize: '12px',
-              width: '100%'
-            }}
-          >
-            Click to speak with Astronaut about {selectedObject}
-          </button>
-        </div>
-      )}
+      {/* REMOVED: Selected Object Overlay */}
       
       <div style={{
         position: 'absolute',
@@ -1460,29 +1435,171 @@ function restoreEarthTexture() {
         🔄 Mouse wheel: Zoom in/out<br/>
         🖱️ Click: Zoom into planets/objects<br/>
         💫 Hover: Objects glow when selectable<br/>
-        {zoomMode ? 
-          '🔍 In zoom mode - click object again to exit or click empty space' : 
-          '☀️ Bright Sun at center, 🪐 Textured planets, 🛰️ Aqua Satellite, ✨ Colorful distant stars'
-        }
+        
       </div>
       
+      
+      {/* User Input and AI Response Section with Astronaut Scene */}
       <div style={{
         position: 'absolute',
         bottom: '10px',
-        left: '10px',
+        right: '10px',
         color: 'white',
-        background: 'rgba(0,0,0,0.7)',
-        padding: '10px',
-        borderRadius: '5px',
+        background: 'rgba(0,0,0,0.8)',
+        padding: '15px',
+        borderRadius: '10px',
         fontFamily: 'Arial, sans-serif',
         fontSize: '12px',
-        maxWidth: '250px'
+        maxWidth: '400px',
+        width: '380px',
+        height: '300px',
+        border: '2px solid rgba(255,255,255,0.1)'
       }}>
-        <strong>Clickable Objects:</strong><br/>
-        Sun (center) |  Mercury |  Venus |  Earth + Aqua satellite<br/>
-       Mars |  Jupiter |  Saturn + Rings |  Uranus |  Neptune<br/>
-        Click any object to zoom in and explore!
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+          <div style={{ flex: 1 }}>
+            <strong style={{ fontSize: '14px' }}>
+              {selectedObject ? `Ask about ${selectedObject}` : 'Ask the Astronaut'}
+            </strong>
+          </div>
+          
+          {/* Astronaut Scene in AI Panel */}
+          {selectedObject && (
+            <div 
+              ref={astronautSceneRef}
+              style={{
+                width: '100px',
+                height: '100px',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                border: '1px solid rgba(255,255,255,0.2)',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                marginLeft: '10px'
+              }}
+            />
+          )}
+        </div>
+        
+        {selectedObject && (
+          <div style={{ fontSize: '11px', opacity: 0.9, lineHeight: '1.3', marginBottom: '10px' }}>
+            <strong>Selected:</strong> {selectedObject}
+            
+            {selectedObject === 'Earth' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(0,100,200,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                🌍 Third planet • Only known planet with life • 71% water coverage
+              </div>
+            )}
+            
+            {selectedObject === 'AquaSat' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(0,170,255,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                🛰️ Monitors Earth's water cycle • Launched 2002 • Studies ocean temperature
+              </div>
+            )}
+            
+            {selectedObject === 'Sun' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(255,215,0,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                ☀️ Center of solar system • 99.86% of system's mass • Powers life on Earth
+              </div>
+            )}
+          </div>
+        )}
+        
+        <input 
+          type="text"
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          placeholder={selectedObject ? `Ask about ${selectedObject}...` : "Select an object first, then ask..."}
+          disabled={!selectedObject}
+          style={{
+            width: '100%',
+            padding: '8px',
+            borderRadius: '4px',
+            border: '1px solid rgba(255,255,255,0.3)',
+            background: selectedObject ? 'rgba(255,255,255,0.1)' : 'rgba(100,100,100,0.1)',
+            color: selectedObject ? 'white' : 'rgba(255,255,255,0.5)',
+            fontSize: '11px',
+            outline: 'none',
+            marginBottom: '8px'
+          }}
+        />
+        
+        <div style={{ display: 'flex', marginBottom: '8px' }}>
+          <button 
+            onClick={() => {
+              if (selectedObject && userInput.trim()) {
+                callAzureOpenAI(userInput);
+              }
+            }}
+            disabled={!selectedObject || !userInput.trim() || isLoading}
+            style={{
+              flex: 1,
+              padding: '8px',
+              backgroundColor: selectedObject && userInput.trim() ? 'rgba(0,100,200,0.8)' : 'rgba(100,100,100,0.3)',
+              border: 'none',
+              borderRadius: '4px',
+              color: 'white',
+              cursor: selectedObject && userInput.trim() ? 'pointer' : 'not-allowed',
+              fontSize: '11px',
+              marginRight: '5px'
+            }}
+          >
+            {isLoading ? 'Asking...' : 'Ask'}
+          </button>
+          
+          <button 
+            onClick={() => setUserInput('')}
+            style={{
+              flex: 1,
+              padding: '8px',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '11px',
+              marginLeft: '5px'
+            }}
+          >
+            Clear
+          </button>
+        </div>
+        
+        <div id="contentResponse" style={{
+          padding: '8px',
+          borderRadius: '4px',
+          background: 'rgba(255,255,255,0.05)',
+          color: 'white',
+          fontSize: '10px',
+          height: '120px',
+          overflowY: 'auto',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          {selectedObject 
+            ? "Select an object and ask a question to chat with the astronaut!" 
+            : "Click on any celestial object first to start a conversation!"
+          }
+        </div>
+        
+        {selectedObject && (
+          <button 
+            onClick={() => setSelectedObject(null)}
+            style={{
+              marginTop: '8px',
+              padding: '6px 12px',
+              backgroundColor: 'rgba(255,100,100,0.2)',
+              border: '1px solid rgba(255,100,100,0.3)',
+              borderRadius: '4px',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '10px',
+              width: '100%'
+            }}
+          >
+            Clear Selection
+          </button>
+        )}
       </div>
     </div>
   );
+  
+  
 }
