@@ -6,14 +6,355 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export default function NASAOceanVR() {
   const containerRef = useRef(null);
+  const astronautSceneRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [zoomMode, setZoomMode] = useState(false);
   const [targetObject, setTargetObject] = useState(null);
+  const [selectedObject, setSelectedObject] = useState(null); // Add this new state
+  const [userInput, setUserInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
   // Add refs to track current state for event handlers
   const zoomModeRef = useRef(false);
   const targetObjectRef = useRef(null);
+  
+  // Astronaut scene refs
+  const astronautRendererRef = useRef(null);
+  const astronautCameraRef = useRef(null);
+  const astronautRef = useRef(null);
+  
+  // ===============================
+  // ASTRONAUT MINI SCENE SETUP
+  // ===============================
+  useEffect(() => {
+    if (!selectedObject || !astronautSceneRef.current) return;
+    
+    // Clear previous scene if it exists
+    if (astronautRendererRef.current) {
+      // Check if the DOM element exists and is a child before removing
+      if (astronautRendererRef.current.domElement && 
+          astronautSceneRef.current && 
+          astronautSceneRef.current.contains(astronautRendererRef.current.domElement)) {
+        astronautSceneRef.current.removeChild(astronautRendererRef.current.domElement);
+      }
+      astronautRendererRef.current.dispose();
+      astronautRendererRef.current = null;
+    }
+    
+    // Create mini scene for astronaut
+    const astronautScene = new THREE.Scene();
+    astronautScene.background = new THREE.Color(0x000000); // Pure black background
+    
+    // Create camera for astronaut scene
+    const astronautCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 100);
+    astronautCamera.position.set(0, 0, 12); // Moved closer for larger astronaut
+    astronautCameraRef.current = astronautCamera;
+    
+    // Create renderer for astronaut scene
+    const astronautRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    astronautRenderer.setSize(120, 120);
+    astronautRenderer.setPixelRatio(window.devicePixelRatio);
+    astronautRenderer.outputColorSpace = THREE.SRGBColorSpace;
+    astronautRenderer.setClearColor(0x000000, 1); // Pure black background
+    astronautRendererRef.current = astronautRenderer;
+    
+    // Enhanced lighting for astronaut scene
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); // Increased ambient light
+    astronautScene.add(ambientLight);
+    
+    // Multiple directional lights for better illumination
+    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+    directionalLight1.position.set(5, 5, 5);
+    astronautScene.add(directionalLight1);
+    
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight2.position.set(-5, -5, 5);
+    astronautScene.add(directionalLight2);
+    
+    const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.6);
+    directionalLight3.position.set(0, -5, -5);
+    astronautScene.add(directionalLight3);
+    
+    // Add rim lighting for better definition
+    const rimLight = new THREE.DirectionalLight(0x4488ff, 0.5);
+    rimLight.position.set(-10, 0, -10);
+    astronautScene.add(rimLight);
+    
+    // Create orbit controls for astronaut scene
+    let astronautControls = null;
+    
+    // Store animation frame ID for cleanup
+    let animationFrameId = null;
+    
+    // Mouse interaction variables
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    let spherical = new THREE.Spherical();
+    spherical.setFromVector3(astronautCamera.position);
+    
+    // Mouse event handlers for 360 view
+    function onMouseDown(event) {
+      isDragging = true;
+      previousMousePosition = {
+        x: event.clientX,
+        y: event.clientY
+      };
+      event.preventDefault();
+    }
+    
+    function onMouseMove(event) {
+      if (!isDragging) return;
+      
+      const deltaMove = {
+        x: event.clientX - previousMousePosition.x,
+        y: event.clientY - previousMousePosition.y
+      };
+      
+      // Update spherical coordinates
+      spherical.theta -= deltaMove.x * 0.01; // Horizontal rotation
+      spherical.phi += deltaMove.y * 0.01;   // Vertical rotation
+      
+      // Limit vertical rotation
+      spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
+      
+      // Update camera position
+      astronautCamera.position.setFromSpherical(spherical);
+      astronautCamera.lookAt(0, 0, 0);
+      
+      previousMousePosition = {
+        x: event.clientX,
+        y: event.clientY
+      };
+    }
+    
+    function onMouseUp() {
+      isDragging = false;
+    }
+    
+    // Mouse wheel for zoom in astronaut scene
+    function onWheel(event) {
+      event.preventDefault();
+      
+      const delta = event.deltaY * 0.01;
+      spherical.radius += delta;
+      spherical.radius = Math.max(8, Math.min(20, spherical.radius)); // Limit zoom range
+      
+      astronautCamera.position.setFromSpherical(spherical);
+      astronautCamera.lookAt(0, 0, 0);
+    }
+    
+    // Load astronaut model
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.load(
+      '/assets/3Dmodels/cute_astronaut.glb',
+      (gltf) => {
+        const astronaut = gltf.scene;
+        astronautRef.current = astronaut;
+        
+        // Enhance astronaut materials with better lighting response
+        astronaut.traverse((child) => {
+          if (child.isMesh) {
+            if (child.material) {
+              // Remove emissive for more realistic lighting
+              child.material.emissive = new THREE.Color(0x000000);
+              child.material.emissiveIntensity = 0;
+              child.material.needsUpdate = true;
+              
+              // Enhance material properties for better lighting
+              if (child.material.color) {
+                child.material.color.multiplyScalar(1.8); // Brighter base color
+              }
+              
+              // Add roughness and metalness for better material response
+              if (child.material.roughness !== undefined) {
+                child.material.roughness = 0.7;
+              }
+              if (child.material.metalness !== undefined) {
+                child.material.metalness = 0.1;
+              }
+            }
+          }
+        });
+        
+        // Center and scale the astronaut to be larger
+        const box = new THREE.Box3().setFromObject(astronaut);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        
+        
+        // Center the astronaut at origin (0, 0, 0)
+        astronaut.position.set(-1, -3, -center.z);
+        
+        // Scale to be larger - fill more of the scene
+        const maxDimension = Math.max(size.x, size.y, size.z);
+        const targetSize = 10; // Increased from 8 to make astronaut larger
+        const scale = targetSize / maxDimension;
+        astronaut.scale.set(scale, scale, scale);
+        
+        astronautScene.add(astronaut);
+      },
+      undefined,
+      (error) => {
+        console.error('Failed to load astronaut for mini scene:', error);
+        // Create larger fallback astronaut
+        const fallbackGeometry = new THREE.BoxGeometry(8, 10, 5); // Larger fallback
+        const fallbackMaterial = new THREE.MeshLambertMaterial({ 
+          color: 0xFFFFFF
+        });
+        const astronaut = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
+        astronautRef.current = astronaut;
+        astronautScene.add(astronaut);
+      }
+    );
+    
+    // Add renderer to DOM and attach event listeners
+    if (astronautSceneRef.current && astronautRenderer.domElement) {
+      astronautSceneRef.current.appendChild(astronautRenderer.domElement);
+      
+      // Add mouse event listeners to the astronaut renderer canvas
+      const canvas = astronautRenderer.domElement;
+      canvas.addEventListener('mousedown', onMouseDown);
+      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('mouseup', onMouseUp);
+      canvas.addEventListener('mouseleave', onMouseUp);
+      canvas.addEventListener('wheel', onWheel);
+      
+      // Set cursor style
+      canvas.style.cursor = 'grab';
+      canvas.addEventListener('mousedown', () => {
+        canvas.style.cursor = 'grabbing';
+      });
+      canvas.addEventListener('mouseup', () => {
+        canvas.style.cursor = 'grab';
+      });
+    }
+    
+    // Animation loop for astronaut scene
+    function animateAstronaut() {
+      if (!astronautRendererRef.current || !selectedObject) {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+        }
+        return;
+      }
+      
+      animationFrameId = requestAnimationFrame(animateAstronaut);
+      
+      // Optional: Add subtle rotation when not being dragged
+      if (!isDragging && astronautRef.current) {
+        astronautRef.current.rotation.y += 0.005; // Slow auto-rotation
+      }
+      
+      astronautRenderer.render(astronautScene, astronautCamera);
+    }
+    
+    animateAstronaut();
+    
+    // Cleanup function
+    return () => {
+      // Cancel animation frame
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      
+      // Remove event listeners
+      if (astronautRendererRef.current?.domElement) {
+        const canvas = astronautRendererRef.current.domElement;
+        canvas.removeEventListener('mousedown', onMouseDown);
+        canvas.removeEventListener('mousemove', onMouseMove);
+        canvas.removeEventListener('mouseup', onMouseUp);
+        canvas.removeEventListener('mouseleave', onMouseUp);
+        canvas.removeEventListener('wheel', onWheel);
+      }
+      
+      // Clean up renderer
+      if (astronautRendererRef.current) {
+        // Check if the DOM element exists and is a child before removing
+        if (astronautRendererRef.current.domElement && 
+            astronautSceneRef.current && 
+            astronautSceneRef.current.contains(astronautRendererRef.current.domElement)) {
+          try {
+            astronautSceneRef.current.removeChild(astronautRendererRef.current.domElement);
+          } catch (error) {
+            console.warn('Could not remove astronaut renderer DOM element:', error);
+          }
+        }
+        
+        // Dispose of renderer
+        try {
+          astronautRendererRef.current.dispose();
+        } catch (error) {
+          console.warn('Could not dispose astronaut renderer:', error);
+        }
+        
+        astronautRendererRef.current = null;
+      }
+      
+      // Clear astronaut reference
+      astronautRef.current = null;
+    };
+  }, [selectedObject]);
+  // End astronaut scene setup useEffect
+
+  // API function to call Azure OpenAI
+  const callAzureOpenAI = async (userInput) => {
+    const apiKey = "5Om697To2BJ3g1oVDXiNpEpP0IfO6WwEcojJ4W6Hyms1FR5fYnaAJQQJ99BFACYeBjFXJ3w3AAAAACOG9UkB"; // Replace with your actual API key
+    const endpoint = "https://thinkerforai-azureaifoundry.cognitiveservices.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-01-01-preview"; // Replace with your actual endpoint
+    
+    const messages = [
+      { role: "system", content: `
+         1. You are CIDAK Space Explorer, a space explorer on a mission to gather information about the solar system and the satellite Aqua.
+          2. Your task is to ask the user insightful questions about various celestial bodies, the solar system, and Aqua. You may also inquire about the environment, scientific phenomena, and discoveries related to Aqua.
+          3. When responding, you will always include at least one element of curiosity or exploration. You may focus on topics like the nature of distant planets, the technology used for space exploration, or the mysteries surrounding Aqua.
+          4. You must ensure your responses are scientifically accurate and reflect the context of space exploration and satellite data collection. 
+          5. Always engage the user in a way that sparks further discussion about space, the solar system, and Aqua's role in Earth's climate and ocean monitoring.
+          8. If no valid continuation or question is possible, respond with: "I'm currently analyzing more data; let's return to the wonders of space exploration soon."`
+      },
+      { role: "user", content: `${userInput} about ${selectedObject}` }
+    ];
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": apiKey
+        },
+        body: JSON.stringify({
+          messages: messages,
+          max_tokens: 800,
+          temperature: 1,
+          top_p: 1,
+          frequency_penalty: 0,
+          presence_penalty: 0
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error.message || "API Error");
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || "No response";
+      
+      // Update the content response div
+      const outputDiv = document.getElementById("contentResponse");
+      if (outputDiv) {
+        outputDiv.innerHTML = `<strong>Generated with Microsoft Azure AI Studio</strong><br>${content}`;
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      const outputDiv = document.getElementById("contentResponse");
+      if (outputDiv) {
+        outputDiv.innerHTML = `<strong>Error:</strong> ${err.message}`;
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   useEffect(() => {
     if (!containerRef.current) return;
@@ -177,6 +518,9 @@ export default function NASAOceanVR() {
       
       console.log('Clicked object:', targetObj.userData?.name || 'Unknown');
       
+      // Set the selected object for the AI functionality (instead of overlay)
+      setSelectedObject(targetObj.userData?.name || 'Unknown Object');
+      
       // Custom click handlers for specific objects
       // Earth
       if (targetObj.userData?.name === 'Earth') {
@@ -188,7 +532,7 @@ export default function NASAOceanVR() {
       }
       // Satellite
       if (targetObj.userData?.name.startsWith('Object_')) {
-        // DO SOMETHING SPECIAL FOR SATELLITE
+        // DO SOMETHING FOR SATELLITE
         // Change Earth Texture for Ocean temperature
         // ecco2_and_grid_web.png
         changeEarthTexture('/assets/imgs/ecco2_and_grid_web.png');
@@ -235,10 +579,11 @@ export default function NASAOceanVR() {
       if (intersects.length > 0) {
         handleObjectClick(intersects[0].object);
       } else {
-        // Clicked on empty space - exit zoom mode
+        // Clicked on empty space - exit zoom mode and clear selected object
         if (zoomModeRef.current) {
           zoomOutOfObject();
         }
+        setSelectedObject(null); // Clear the selected object when clicking empty space
       }
     }
     
@@ -1071,6 +1416,8 @@ function restoreEarthTexture() {
         </div>
       )}
       
+      {/* REMOVED: Selected Object Overlay */}
+      
       <div style={{
         position: 'absolute',
         top: '10px',
@@ -1088,29 +1435,171 @@ function restoreEarthTexture() {
         🔄 Mouse wheel: Zoom in/out<br/>
         🖱️ Click: Zoom into planets/objects<br/>
         💫 Hover: Objects glow when selectable<br/>
-        {zoomMode ? 
-          '🔍 In zoom mode - click object again to exit or click empty space' : 
-          '☀️ Bright Sun at center, 🪐 Textured planets, 🛰️ Aqua Satellite, ✨ Colorful distant stars'
-        }
+        
       </div>
       
+      
+      {/* User Input and AI Response Section with Astronaut Scene */}
       <div style={{
         position: 'absolute',
         bottom: '10px',
-        left: '10px',
+        right: '10px',
         color: 'white',
-        background: 'rgba(0,0,0,0.7)',
-        padding: '10px',
-        borderRadius: '5px',
+        background: 'rgba(0,0,0,0.8)',
+        padding: '15px',
+        borderRadius: '10px',
         fontFamily: 'Arial, sans-serif',
         fontSize: '12px',
-        maxWidth: '250px'
+        maxWidth: '400px',
+        width: '380px',
+        height: selectedObject ? '400px' : '10px',
+        border: '2px solid rgba(255,255,255,0.1)'
       }}>
-        <strong>Clickable Objects:</strong><br/>
-        Sun (center) |  Mercury |  Venus |  Earth + Aqua satellite<br/>
-       Mars |  Jupiter |  Saturn + Rings |  Uranus |  Neptune<br/>
-        Click any object to zoom in and explore!
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+          <div style={{ flex: 1 }}>
+            <strong style={{ fontSize: '14px' }}>
+              {selectedObject ? `Ask about ${selectedObject}` : 'Select an object first, then ask...'}
+            </strong>
+          </div>
+          
+          {/* Astronaut Scene in AI Panel */}
+          {selectedObject && (
+            <div 
+              ref={astronautSceneRef}
+              style={{
+                width: '100px',
+                height: '100px',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                border: '1px solid rgba(255,255,255,0.2)',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                marginLeft: '10px'
+              }}
+            />
+          )}
+        </div>
+        
+        {selectedObject && (
+          <div style={{ fontSize: '11px', opacity: 0.9, lineHeight: '1.3', marginBottom: '10px' }}>
+            <strong>Selected:</strong> {selectedObject}
+            
+            {selectedObject === 'Earth' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(0,100,200,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                🌍 Third planet • Only known planet with life • 71% water coverage
+              </div>
+            )}
+            
+            {selectedObject === 'AquaSat' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(0,170,255,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                🛰️ Monitors Earth's water cycle • Launched 2002 • Studies ocean temperature
+              </div>
+            )}
+            
+            {selectedObject === 'Sun' && (
+              <div style={{ marginTop: '5px', padding: '5px', backgroundColor: 'rgba(255,215,0,0.2)', borderRadius: '3px', fontSize: '10px' }}>
+                ☀️ Center of solar system • 99.86% of system's mass • Powers life on Earth
+              </div>
+            )}
+          </div>
+        )}
+        
+        <input 
+          type="text"
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          placeholder={selectedObject ? `Ask about ${selectedObject}...` : "Select an object first, then ask..."}
+          disabled={!selectedObject}
+          style={{
+            width: '100%',
+            padding: '8px',
+            borderRadius: '4px',
+            border: '1px solid rgba(255,255,255,0.3)',
+            background: selectedObject ? 'rgba(255,255,255,0.1)' : 'rgba(100,100,100,0.1)',
+            color: selectedObject ? 'white' : 'rgba(255,255,255,0.5)',
+            fontSize: '11px',
+            outline: 'none',
+            marginBottom: '8px'
+          }}
+        />
+        
+        <div style={{ display: 'flex', marginBottom: '8px' }}>
+          <button 
+            onClick={() => {
+              if (selectedObject && userInput.trim()) {
+                callAzureOpenAI(userInput);
+              }
+            }}
+            disabled={!selectedObject || !userInput.trim() || isLoading}
+            style={{
+              flex: 1,
+              padding: '8px',
+              backgroundColor: selectedObject && userInput.trim() ? 'rgba(0,100,200,0.8)' : 'rgba(100,100,100,0.3)',
+              border: 'none',
+              borderRadius: '4px',
+              color: 'white',
+              cursor: selectedObject && userInput.trim() ? 'pointer' : 'not-allowed',
+              fontSize: '11px',
+              marginRight: '5px'
+            }}
+          >
+            {isLoading ? 'Asking...' : 'Ask'}
+          </button>
+          
+          <button 
+            onClick={() => setUserInput('')}
+            style={{
+              flex: 1,
+              padding: '8px',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '11px',
+              marginLeft: '5px'
+            }}
+          >
+            Clear
+          </button>
+        </div>
+        
+        <div id="contentResponse" style={{
+          padding: '8px',
+          borderRadius: '4px',
+          background: 'rgba(255,255,255,0.05)',
+          color: 'white',
+          fontSize: '10px',
+          height: '120px',
+          overflowY: 'auto',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          {selectedObject 
+            ? "Select an object and ask a question to chat with the astronaut!" 
+            : "Click on any celestial object first to start a conversation!"
+          }
+        </div>
+        
+        {selectedObject && (
+          <button 
+            onClick={() => setSelectedObject(null)}
+            style={{
+              marginTop: '8px',
+              padding: '6px 12px',
+              backgroundColor: 'rgba(255,100,100,0.2)',
+              border: '1px solid rgba(255,100,100,0.3)',
+              borderRadius: '4px',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '10px',
+              width: '100%'
+            }}
+          >
+            Clear Selection
+          </button>
+        )}
       </div>
     </div>
   );
+  
+  
 }
