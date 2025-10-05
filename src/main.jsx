@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { XRDevice, metaQuest3 } from 'iwer';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { callAzureOpenAI, updateResponseDiv } from './api/AzureOpenAI.jsx';
@@ -14,6 +15,7 @@ import { createNeptune, animateNeptune, NEPTUNE_CONFIG } from './planets/Neptune
 import { createSaturn, animateSaturn, SATURN_CONFIG } from './planets/Saturn.jsx';
 import { createMars, animateMars, MARS_CONFIG } from './planets/Mars.jsx';
 import { loadAquaSatellite, animateAquaSatellite, AQUA_SAT_CONFIG } from './satellite/Satellite.jsx';
+import AboutDialog from './about.jsx';
 
 export default function NASAOceanVR() {
   const containerRef = useRef(null);
@@ -25,6 +27,7 @@ export default function NASAOceanVR() {
   const [selectedObject, setSelectedObject] = useState(null);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   
   // Add refs to track current state for event handlers
   const zoomModeRef = useRef(false);
@@ -325,6 +328,9 @@ export default function NASAOceanVR() {
   }, [selectedObject]);
   // End astronaut scene setup useEffect
 
+  // ===============================
+  // MAIN SCENE SETUP
+  // ===============================
   useEffect(() => {
     if (!containerRef.current) return;
     
@@ -333,111 +339,318 @@ export default function NASAOceanVR() {
     xrDevice.installRuntime();
     xrDevice.position.set(0, 1.8, 0);
     
-    let scene, camera, renderer, controls;
+    let scene, camera, renderer, controls, fpControls;
     let earth, moon, aquaSat, particles;
-    let jupiter, venus, uranus, mercury, neptune, saturn, mars; // Add mars ref
-    let planets = {}; // Store all planets
-    let labels = []; // Store all labels
-    let clickableObjects = []; // Store all clickable objects
-    let hoveredObject = null; // Track currently hovered object
-    let originalMaterials = new Map(); // Store original materials for glow effect
+    let jupiter, venus, uranus, mercury, neptune, saturn, mars;
+    let planets = {};
+    let labels = [];
+    let clickableObjects = [];
+    let hoveredObject = null;
+    let originalMaterials = new Map();
     
-    // Scene setup
+    // Camera system state
+    let manualMovement = false;
+    let keysPressed = {};
+    let isTeleporting = false;
+    let currentTeleportIndex = 0;
+    let originalCameraPosition = new THREE.Vector3();
+    let originalControlsTarget = new THREE.Vector3();
+    let originalMinDistance = 0.1;
+    let originalMaxDistance = 200;
+    
+    const teleportPoints = [
+      { name: 'Solar System Overview', position: [0, 1, 150] },
+      { name: 'Near Earth', position: [0, 1, 60] },
+      { name: 'Near Sun', position: [0, 1, 20] },
+      { name: 'Jupiter View', position: [-70, 1, -70] },
+      { name: 'Saturn View', position: [100, 1, 90] },
+      { name: 'Mars View', position: [50, 1, -50] },
+    ];
+    
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0a0a); // Darker background for better contrast
+    scene.background = new THREE.Color(0x0a0a0a);
     
-    // Camera positioned at the center (user position)
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 1, 150); // User at center point
-    
-    // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0; // Reduced from 1.5
+    renderer.toneMappingExposure = 1.0;
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.left = '0';
+    renderer.domElement.style.zIndex = '1'; // Keep this low
     containerRef.current.appendChild(renderer.domElement);
     
-    // OrbitControls - configure to rotate around user position (0,0,0)
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1, 150);
+    
     controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 0, 0); // Target is the user position
+    controls.target.set(0, 0, 0);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.enableZoom = true;
-    controls.minDistance = 0.1; // Allow very close zoom
-    controls.maxDistance = 200; // Increased for solar system
-    controls.enablePan = false; // Disable panning to keep user at center
+    controls.minDistance = 0.1;
+    controls.maxDistance = 200;
+    controls.enablePan = false;
     controls.update();
     
+    // PointerLockControls for WASD movement
+    fpControls = new PointerLockControls(camera, renderer.domElement);
+    
+    fpControls.addEventListener('lock', () => {
+      console.log('🔒 Pointer locked - WASD movement active');
+    });
+    
+    fpControls.addEventListener('unlock', () => {
+      console.log('🔓 Pointer unlocked - returning to orbit controls');
+      manualMovement = false;
+      controls.enabled = true;
+    });
+    
     // ===============================
-    // RAYCASTER SETUP FOR OBJECT INTERACTIONS
+    // CAMERA CONTROL FUNCTIONS - FIXED
+    // ===============================
+    function toggleManualMovement() {
+      manualMovement = !manualMovement;
+      
+      if (manualMovement) {
+        console.log('🎮 Enabling WASD movement mode');
+        controls.enabled = false;
+        
+        // Try to request pointer lock with improved messaging
+        try {
+          renderer.domElement.requestPointerLock();
+          console.log('🔒 Requesting pointer lock...');
+        } catch (err) {
+          console.error('❌ Pointer lock failed:', err);
+          alert("Click on the scene and press M again to enable movement");
+          manualMovement = false;
+          controls.enabled = true;
+        }
+      } else {
+        console.log('🖱️ Disabling WASD movement mode');
+        if (document.pointerLockElement === renderer.domElement) {
+          document.exitPointerLock();
+        }
+        controls.enabled = true;
+      }
+    }
+    
+    function updateCameraMovement() {
+      if (!manualMovement) return;
+      
+      // Check pointer lock status - if not locked, try to lock again
+      if (!fpControls.isLocked) {
+        console.log('🔑 Movement attempted but pointer not locked, retrying lock...');
+        renderer.domElement.requestPointerLock();
+        return;
+      }
+
+      const moveSpeed = 2.0; // Increased for better feel
+      const direction = new THREE.Vector3(0, 0, 0);
+      
+      // Process WASD/Arrow keys
+      if (keysPressed['w'] || keysPressed['arrowup']) direction.z -= 1;
+      if (keysPressed['s'] || keysPressed['arrowdown']) direction.z += 1;
+      if (keysPressed['a'] || keysPressed['arrowleft']) direction.x -= 1;
+      if (keysPressed['d'] || keysPressed['arrowright']) direction.x += 1;
+      
+      // Only apply movement if there's a direction
+      if (direction.length() > 0) {
+        console.log('🚶 Moving in direction:', direction);
+        direction.normalize();
+        fpControls.moveRight(direction.x * moveSpeed);
+        fpControls.moveForward(-direction.z * moveSpeed);
+      }
+    }
+    
+    function teleportToPoint(pointIndex) {
+      if (isTeleporting || !teleportPoints[pointIndex]) return;
+      
+      const targetPoint = teleportPoints[pointIndex];
+      console.log('🚀 Teleporting to:', targetPoint.name);
+      
+      if (manualMovement) toggleManualMovement();
+      
+      isTeleporting = true;
+      controls.enabled = false;
+      
+      const startPosition = camera.position.clone();
+      const startTarget = controls.target.clone();
+      const targetPosition = new THREE.Vector3(...targetPoint.position);
+      const targetLookAt = new THREE.Vector3(0, 0, 0);
+      
+      controls.target.copy(targetLookAt);
+      
+      let progress = 0;
+      const duration = 1000;
+      const startTime = Date.now();
+      
+      function animateTeleport() {
+        const elapsed = Date.now() - startTime;
+        progress = Math.min(elapsed / duration, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        
+        camera.position.lerpVectors(startPosition, targetPosition, easedProgress);
+        controls.target.lerpVectors(startTarget, targetLookAt, easedProgress);
+        controls.update();
+        
+        if (progress < 1) {
+          requestAnimationFrame(animateTeleport);
+        } else {
+          console.log('✅ Teleportation completed to:', targetPoint.name);
+          controls.enabled = true;
+          isTeleporting = false;
+          currentTeleportIndex = pointIndex;
+        }
+      }
+      
+      animateTeleport();
+    }
+    
+    function handleKeyDown(event) {
+      const key = event.key.toLowerCase();
+      keysPressed[key] = true;
+      
+      console.log('🎮 Key detected:', key);
+      
+      // Handle movement keys (WASD/arrows)
+      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+        if (manualMovement) {
+          console.log('🏃 Movement key pressed:', key);
+          event.preventDefault();
+        }
+        return; // Let updateCameraMovement handle the actual movement
+      }
+
+      // Toggle manual movement with 'M' key
+      if (key === 'm') {
+        console.log('👁️ Toggling movement mode');
+        event.preventDefault();
+        toggleManualMovement();
+        return;
+      }
+      
+      if (key === 't') {
+        event.preventDefault();
+        event.stopPropagation();
+        const nextIndex = (currentTeleportIndex + 1) % teleportPoints.length;
+        teleportToPoint(nextIndex);
+        return;
+      }
+      
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        event.stopPropagation();
+        const prevIndex = (currentTeleportIndex - 1 + teleportPoints.length) % teleportPoints.length;
+        teleportToPoint(prevIndex);
+        return;
+      }
+      
+      const numKey = parseInt(event.key);
+      if (numKey >= 1 && numKey <= 6) {
+        event.preventDefault();
+        event.stopPropagation();
+        teleportToPoint(numKey - 1);
+        return;
+      }
+    }
+    
+    function handleKeyUp(event) {
+      const key = event.key.toLowerCase();
+      keysPressed[key] = false;
+    }
+    
+    // Add pointer lock change listener
+    function handlePointerLockChange() {
+      if (document.pointerLockElement !== renderer.domElement) {
+        // Pointer lock was lost
+        if (manualMovement) {
+          console.log('🔓 Pointer lock lost - returning to orbit controls');
+          manualMovement = false;
+          controls.enabled = true;
+          
+          // Sync orbit controls
+          const direction = new THREE.Vector3();
+          camera.getWorldDirection(direction);
+          controls.target.copy(camera.position.clone().add(direction.multiplyScalar(10)));
+          controls.update();
+        }
+      }
+    }
+    
+    // ADD THIS FUNCTION:
+    function handleResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    
+    // Add event listeners with proper cleanup
+    // Comment out keyboard event listeners
+    // document.addEventListener('keydown', handleKeyDown, true);
+    // document.addEventListener('keyup', handleKeyUp, true);
+    // document.addEventListener('pointerlockchange', handlePointerLockChange);
+    window.addEventListener('resize', handleResize);
+    
+    console.log('✅ Mouse-only camera system initialized');
+    console.log('📋 Mouse Controls:');
+    console.log('  🖱️ Left-click + drag: Rotate view');
+    console.log('  🖱️ Scroll wheel: Zoom in/out');
+    console.log('  🖱️ Click on objects: Select and zoom into objects');
+    
+    // ===============================
+    // RAYCASTER AND OBJECT INTERACTION
     // ===============================
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     
-    // Function to add object to clickable objects array
     function addClickableObject(object) {
       clickableObjects.push(object);
     }
     
-    // Function to handle mouse position calculation
     function updateMousePosition(event) {
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     }
     
-    // Function to get intersected objects
     function getIntersectedObjects() {
       raycaster.setFromCamera(mouse, camera);
-      
-      // Create array of all objects to check (including child meshes)
       const objectsToCheck = [];
       
       clickableObjects.forEach(obj => {
         if (obj.isMesh) {
           objectsToCheck.push(obj);
         } else {
-          // If it's a group (like the satellite), add all child meshes
           obj.traverse((child) => {
-            if (child.isMesh) {
-              objectsToCheck.push(child);
-            }
+            if (child.isMesh) objectsToCheck.push(child);
           });
         }
       });
       
-      const intersects = raycaster.intersectObjects(objectsToCheck, false);
-      return intersects;
+      return raycaster.intersectObjects(objectsToCheck, false);
     }
     
-    // Function to add glow effect to object
     function addGlowEffect(object) {
-      // Find the main mesh to apply glow to
       let targetMesh = object;
       if (!object.isMesh && object.children.length > 0) {
-        // For groups, find the first mesh
         object.traverse((child) => {
-          if (child.isMesh && !targetMesh.isMesh) {
-            targetMesh = child;
-          }
+          if (child.isMesh && !targetMesh.isMesh) targetMesh = child;
         });
       }
       
       if (targetMesh.isMesh && targetMesh.material) {
-        // Store original material if not already stored
         if (!originalMaterials.has(targetMesh)) {
           originalMaterials.set(targetMesh, targetMesh.material.clone());
         }
         
-        // Apply glow effect
         if (targetMesh.material.emissive) {
           targetMesh.material.emissive.setHex(0x444444);
           targetMesh.material.emissiveIntensity = 0.5;
         }
         
-        // Add subtle scale effect
         if (!targetMesh.userData.originalScale) {
           targetMesh.userData.originalScale = targetMesh.scale.clone();
         }
@@ -445,41 +658,106 @@ export default function NASAOceanVR() {
       }
     }
     
-    // Function to remove glow effect from object
     function removeGlowEffect(object) {
-      // Find the main mesh to remove glow from
       let targetMesh = object;
       if (!object.isMesh && object.children.length > 0) {
-        // For groups, find the first mesh
         object.traverse((child) => {
-          if (child.isMesh && !targetMesh.isMesh) {
-            targetMesh = child;
-          }
+          if (child.isMesh && !targetMesh.isMesh) targetMesh = child;
         });
       }
       
       if (targetMesh.isMesh && originalMaterials.has(targetMesh)) {
-        // Restore original material properties
         const originalMaterial = originalMaterials.get(targetMesh);
         if (targetMesh.material.emissive && originalMaterial.emissive) {
           targetMesh.material.emissive.copy(originalMaterial.emissive);
           targetMesh.material.emissiveIntensity = originalMaterial.emissiveIntensity || 0;
         }
         
-        // Restore original scale
         if (targetMesh.userData.originalScale) {
           targetMesh.scale.copy(targetMesh.userData.originalScale);
         }
       }
     }
     
-    // Function to handle object clicks
-    function handleObjectClick(intersectedObject) {
+    function zoomIntoObject(object) {
+      if (!object || zoomModeRef.current) return;
       
-      // Find the parent object (in case we clicked a child mesh)
+      console.log('🔍 Zooming into:', object.userData?.name);
+      
+      if (manualMovement) toggleManualMovement();
+      
+      originalCameraPosition.copy(camera.position);
+      originalControlsTarget.copy(controls.target);
+      originalMinDistance = controls.minDistance;
+      originalMaxDistance = controls.maxDistance;
+      
+      zoomModeRef.current = true;
+      
+      let objectPosition = object.position.clone();
+      let objectSize = 5;
+      
+      const distance = Math.max(objectSize * 2.5, 10);
+      const cameraOffset = new THREE.Vector3(0, 0, distance);
+      const newCameraPosition = objectPosition.clone().add(cameraOffset);
+      
+      animateCameraTo(newCameraPosition, objectPosition, distance * 0.3, distance * 3, () => {
+        setZoomMode(true);
+        setTargetObject(object);
+      });
+    }
+    
+    function zoomOutOfObject() {
+      if (!zoomModeRef.current) return;
+      
+      console.log('🔙 Zooming out');
+      zoomModeRef.current = false;
+      
+      animateCameraTo(
+        originalCameraPosition,
+        originalControlsTarget,
+        originalMinDistance,
+        originalMaxDistance,
+        () => {
+          setZoomMode(false);
+          setTargetObject(null);
+        }
+      );
+    }
+    
+    function animateCameraTo(targetPosition, targetLookAt, minDist, maxDist, onComplete) {
+      const startPosition = camera.position.clone();
+      const startTarget = controls.target.clone();
+      const startMinDistance = controls.minDistance;
+      const startMaxDistance = controls.maxDistance;
+      
+      let progress = 0;
+      const duration = 800;
+      const startTime = Date.now();
+      
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        progress = Math.min(elapsed / duration, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        
+        camera.position.lerpVectors(startPosition, targetPosition, easedProgress);
+        controls.target.lerpVectors(startTarget, targetLookAt, easedProgress);
+        controls.minDistance = THREE.MathUtils.lerp(startMinDistance, minDist, easedProgress);
+        controls.maxDistance = THREE.MathUtils.lerp(startMaxDistance, maxDist, easedProgress);
+        controls.update();
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else if (onComplete) {
+          onComplete();
+        }
+      }
+      
+      animate();
+    }
+    
+    function handleObjectClick(intersectedObject) {
       let targetObj = intersectedObject;
       
-      // Check if this is a child of a clickable object
       clickableObjects.forEach(clickableObj => {
         if (clickableObj.children.includes(intersectedObject) || clickableObj === intersectedObject) {
           targetObj = clickableObj;
@@ -487,47 +765,33 @@ export default function NASAOceanVR() {
       });
       
       console.log('Clicked object:', targetObj.userData?.name || 'Unknown');
-      
-      // Set the selected object for the AI functionality (instead of overlay)
       setSelectedObject(targetObj.userData?.name || 'Unknown Object');
+      zoomIntoObject(targetObj);
       
       // Custom click handlers for specific objects
-      // Earth
       if (targetObj.userData?.name === 'Earth') {
         restoreEarthTexture(earth);
       }
-      if (targetObj.userData?.name === 'Sun') {
-        // DO SOMETHING
-        
-      }
-      // Satellite
+      
       if (targetObj.userData?.name.startsWith('Object_')) {
-        // DO SOMETHING FOR SATELLITE
-        // Change Earth Texture for Ocean temperature
-        // ecco2_and_grid_web.png
         changeEarthTexture(earth, '/assets/imgs/ecco2_and_grid_web.png', textureLoader);
       }
     }
     
-    // Mouse hover effects
     function handleMouseMove(event) {
       updateMousePosition(event);
       const intersects = getIntersectedObjects();
       
-      // Reset cursor
       document.body.style.cursor = 'default';
       
-      // Remove glow from previously hovered object
       if (hoveredObject) {
         removeGlowEffect(hoveredObject);
         hoveredObject = null;
       }
       
       if (intersects.length > 0) {
-        // Change cursor to pointer when hovering over clickable objects
         document.body.style.cursor = 'pointer';
         
-        // Find the parent clickable object
         let targetObj = intersects[0].object;
         clickableObjects.forEach(clickableObj => {
           if (clickableObj.children.includes(intersects[0].object) || clickableObj === intersects[0].object) {
@@ -541,7 +805,6 @@ export default function NASAOceanVR() {
       }
     }
     
-    // Click event handler
     function handleClick(event) {
       updateMousePosition(event);
       const intersects = getIntersectedObjects();
@@ -549,16 +812,20 @@ export default function NASAOceanVR() {
       if (intersects.length > 0) {
         handleObjectClick(intersects[0].object);
       } else {
-        // Clicked on empty space - exit zoom mode and clear selected object
+        // Use CameraSystem's zoom out functionality
         if (zoomModeRef.current) {
           zoomOutOfObject();
         }
-        setSelectedObject(null); // Clear the selected object when clicking empty space
+        setSelectedObject(null);
       }
     }
     
+    // Add event listeners
+    renderer.domElement.addEventListener('click', handleClick);
+    renderer.domElement.addEventListener('mousemove', handleMouseMove);
+    
     // ===============================
-    // LABEL CREATION FUNCTION
+    // LABELS
     // ===============================
     function createLabel(text, position, color = '#ffffff') {
       // Create canvas for text texture
@@ -641,9 +908,6 @@ export default function NASAOceanVR() {
       return sprite;
     }
     
-    // ===============================
-    // UPDATE LABELS FUNCTION
-    // ===============================
     function updateLabels() {
       labels.forEach(label => {
         // Make labels always face the camera
@@ -687,218 +951,56 @@ export default function NASAOceanVR() {
     }
     
     // ===============================
-    // ZOOM FUNCTIONALITY
+    // LIGHTING
     // ===============================
-    let originalCameraPosition = new THREE.Vector3();
-    let originalControlsTarget = new THREE.Vector3();
-    let originalMinDistance = 0.1;
-    let originalMaxDistance = 200;
-
-    // Function to zoom into object - FIXED VERSION
-    function zoomIntoObject(object) {
-      if (!object || zoomModeRef.current) return;
-      
-      // Store original camera settings
-      originalCameraPosition.copy(camera.position);
-      originalControlsTarget.copy(controls.target);
-      originalMinDistance = controls.minDistance;
-      originalMaxDistance = controls.maxDistance;
-      
-      // Update refs first
-      zoomModeRef.current = true;
-      targetObjectRef.current = object;
-      
-      // Then update React state for UI
-      setZoomMode(true);
-      setTargetObject(object);
-      
-      // Get object position - handle both single meshes and groups
-      let objectPosition = object.position.clone();
-      let objectSize = 1; // Default size
-      
-      // Calculate bounding box more reliably
-      try {
-        const boundingBox = new THREE.Box3();
-        
-        // For groups (like satellite), we need to update world matrix first
-        if (object.children && object.children.length > 0) {
-          object.updateMatrixWorld(true);
-          boundingBox.setFromObject(object);
-        } else {
-          // For single meshes
-          object.updateMatrixWorld(true);
-          boundingBox.setFromObject(object);
-        }
-        
-        const size = boundingBox.getSize(new THREE.Vector3());
-        objectSize = Math.max(size.x, size.y, size.z);
-        
-        // If bounding box calculation failed or returned invalid size
-        if (!isFinite(objectSize) || objectSize <= 0) {
-          // Fallback based on object type
-          if (object.userData?.name === 'Sun') {
-            objectSize = 24; // Sun diameter
-          } else if (object.userData?.name === 'AquaSat') {
-            objectSize = 4; // Satellite approximate size
-          } else if (object.userData?.name === 'Jupiter') {
-            objectSize = 16; // Jupiter diameter
-          } else if (object.userData?.name === 'Saturn') {
-            objectSize = 14; // Saturn diameter
-          } else {
-            objectSize = 5; // Default planet size
-          }
-        }
-      } catch (error) {
-        console.warn('Bounding box calculation failed, using fallback size', error);
-        // Fallback sizes based on object name
-        if (object.userData?.name === 'Sun') {
-          objectSize = 24;
-        } else if (object.userData?.name === 'AquaSat') {
-          objectSize = 4;
-        } else if (object.userData?.name === 'Jupiter') {
-          objectSize = 16;
-        } else if (object.userData?.name === 'Saturn') {
-          objectSize = 14;
-        } else {
-          objectSize = 5;
-        }
-      }
-      
-      // Calculate new camera position with better distance calculation
-      const distance = Math.max(objectSize * 2.5, 10); // Minimum distance of 10
-      
-      // Position camera in front of object (along Z-axis from object's perspective)
-      const cameraOffset = new THREE.Vector3(0, 0, distance);
-      
-      // If object is very far from origin, approach from current camera direction
-      const objectDistanceFromOrigin = objectPosition.length();
-      if (objectDistanceFromOrigin > 50) {
-        // Calculate direction from camera to object
-        const directionToObject = objectPosition.clone().sub(camera.position).normalize();
-        const newCameraPosition = objectPosition.clone().sub(directionToObject.multiplyScalar(distance));
-        
-        // Animate camera to new position
-        animateCamera(newCameraPosition, objectPosition, distance * 0.3, distance * 3);
-      } else {
-        // For objects closer to origin, use standard offset
-        const newCameraPosition = objectPosition.clone().add(cameraOffset);
-        
-        // Animate camera to new position
-        animateCamera(newCameraPosition, objectPosition, distance * 0.3, distance * 3);
-      }
-    }
-
-    // Function to zoom out of object
-    function zoomOutOfObject() {
-      if (!zoomModeRef.current) return;
-      
-      // Update refs first
-      zoomModeRef.current = false;
-      targetObjectRef.current = null;
-      
-      // Then update React state for UI
-      setZoomMode(false);
-      setTargetObject(null);
-      
-      // Animate back to original position
-      animateCamera(originalCameraPosition, originalControlsTarget, originalMinDistance, originalMaxDistance);
-    }
-
-    // Camera animation function
-    function animateCamera(targetPosition, targetLookAt, minDist, maxDist) {
-      const startPosition = camera.position.clone();
-      const startTarget = controls.target.clone();
-      const startMinDistance = controls.minDistance;
-      const startMaxDistance = controls.maxDistance;
-      
-      let progress = 0;
-      const duration = 800; // 0.8 seconds
-      const startTime = Date.now();
-      
-      function animate() {
-        const elapsed = Date.now() - startTime;
-        progress = Math.min(elapsed / duration, 1);
-        
-        // Smooth easing
-        const easedProgress = 1 - Math.pow(1 - progress, 3);
-        
-        // Interpolate camera position
-        camera.position.lerpVectors(startPosition, targetPosition, easedProgress);
-        controls.target.lerpVectors(startTarget, targetLookAt, easedProgress);
-        
-        // Interpolate zoom limits
-        controls.minDistance = THREE.MathUtils.lerp(startMinDistance, minDist, easedProgress);
-        controls.maxDistance = THREE.MathUtils.lerp(startMaxDistance, maxDist, easedProgress);
-        
-        controls.update();
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        }
-      }
-      
-      animate();
-    }
-    
-    // ===============================
-    // BALANCED LIGHTING SETUP
-    // ===============================
-    
-    // Moderate ambient light for overall illumination
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
     scene.add(ambientLight);
     
-    // Primary sun light - moderate intensity
     const sunLight = new THREE.PointLight(0xffffff, 1.0, 2000);
     sunLight.position.set(0, 0, 0);
     scene.add(sunLight);
     
-    // Single directional light to simulate distant sun illumination
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
     directionalLight.position.set(100, 100, 100);
     scene.add(directionalLight);
 
     // ===============================
-    // COLORFUL PARTICLES BACKGROUND (FAR AWAY)
+    // PARTICLES
     // ===============================
     function createParticles() {
       const particlesGeometry = new THREE.BufferGeometry();
-      const particleCount = 800; // Reduced from 2000
+      const particleCount = 800;
       const positions = new Float32Array(particleCount * 3);
       const colors = new Float32Array(particleCount * 3);
       
       for (let i = 0; i < particleCount; i++) {
-        // Position particles much farther away from solar system
         const i3 = i * 3;
-        positions[i3] = (Math.random() - 0.5) * 1600;     // Much larger spread (1600 vs 400)
+        positions[i3] = (Math.random() - 0.5) * 1600;
         positions[i3 + 1] = (Math.random() - 0.5) * 1600;
         positions[i3 + 2] = (Math.random() - 0.5) * 1600;
         
-        // Ensure particles are far from the solar system center
         const distance = Math.sqrt(positions[i3]**2 + positions[i3 + 1]**2 + positions[i3 + 2]**2);
-        if (distance < 300) { // If too close to solar system
-          // Push particle farther away
+        if (distance < 300) {
           const factor = 300 / distance;
           positions[i3] *= factor;
           positions[i3 + 1] *= factor;
           positions[i3 + 2] *= factor;
         }
         
-        // Random colors for each particle
-        colors[i3] = Math.random();     // Red component
-        colors[i3 + 1] = Math.random(); // Green component
-        colors[i3 + 2] = Math.random(); // Blue component
+        colors[i3] = Math.random();
+        colors[i3 + 1] = Math.random();
+        colors[i3 + 2] = Math.random();
       }
       
       particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
       particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
       
       const particlesMaterial = new THREE.PointsMaterial({
-        size: 0.3, // Smaller size (was 1.0)
+        size: 0.3,
         transparent: true,
-        opacity: 0.7, // Slightly more transparent
-        vertexColors: true, // Enable vertex colors for random colors
-        sizeAttenuation: true // Make particles smaller when farther away
+        opacity: 0.7,
+        vertexColors: true,
+        sizeAttenuation: true
       });
       
       particles = new THREE.Points(particlesGeometry, particlesMaterial);
@@ -908,7 +1010,7 @@ export default function NASAOceanVR() {
     createParticles();
     
     // ===============================
-    // SOLAR SYSTEM PLANETS WITH TEXTURES
+    // CREATE PLANETS
     // ===============================
     const textureLoader = new THREE.TextureLoader();
     const sunGeometry = new THREE.SphereGeometry(12, 32, 32);
@@ -917,7 +1019,7 @@ export default function NASAOceanVR() {
     textureLoader.load(
       '/assets/imgs/sun.jpg',
       (sunTexture) => {
-        const sunMaterial = new THREE.MeshBasicMaterial({ 
+        const sunMaterial = new THREE.MeshStandardMaterial({ 
           map: sunTexture,
           emissive: 0xFFD700,
           emissiveIntensity: 0.8
@@ -927,17 +1029,13 @@ export default function NASAOceanVR() {
         sun.userData = { name: 'Sun', rotationSpeed: 0.001 };
         scene.add(sun);
         planets.Sun = sun;
-        
-        // Add to clickable objects
         addClickableObject(sun);
-        
-        // Create label for Sun
         createLabel('Sun', sun.position, '#FFD700');
       },
       undefined,
       (error) => {
         // Fallback sun material without texture
-        const sunMaterial = new THREE.MeshBasicMaterial({ 
+        const sunMaterial = new THREE.MeshStandardMaterial({ 
           color: 0xFFD700,
           emissive: 0xFFD700,
           emissiveIntensity: 1.0
@@ -947,11 +1045,7 @@ export default function NASAOceanVR() {
         sun.userData = { name: 'Sun', rotationSpeed: 0.001 };
         scene.add(sun);
         planets.Sun = sun;
-        
-        // Add to clickable objects
         addClickableObject(sun);
-        
-        // Create label for Sun
         createLabel('Sun', sun.position, '#FFD700');
       }
     );
@@ -966,9 +1060,7 @@ export default function NASAOceanVR() {
       })
       .then((moonMesh) => {
         moon = moonMesh;
-        if (moon) {
-          planets.Moon = moon;
-        }
+        if (moon) planets.Moon = moon;
         
         // Load satellite after Earth and Moon are created
         return loadAquaSatellite(scene, earth, addClickableObject, createLabel, setLoading);
@@ -983,73 +1075,38 @@ export default function NASAOceanVR() {
 
     // Create Mercury
     createMercury(textureLoader, scene, addClickableObject, createLabel)
-      .then((mercuryMesh) => {
-        mercury = mercuryMesh;
-        planets.Mercury = mercury;
-      })
-      .catch((error) => {
-        console.error('Error creating Mercury:', error);
-      });
+      .then((mercuryMesh) => { mercury = mercuryMesh; planets.Mercury = mercury; })
+      .catch((error) => console.error('Error creating Mercury:', error));
 
     // Create Venus
     createVenus(textureLoader, scene, addClickableObject, createLabel)
-      .then((venusMesh) => {
-        venus = venusMesh;
-        planets.Venus = venus;
-      })
-      .catch((error) => {
-        console.error('Error creating Venus:', error);
-      });
+      .then((venusMesh) => { venus = venusMesh; planets.Venus = venus; })
+      .catch((error) => console.error('Error creating Venus:', error));
 
     // Create Mars
     createMars(textureLoader, scene, addClickableObject, createLabel)
-      .then((marsMesh) => {
-        mars = marsMesh;
-        planets.Mars = mars;
-      })
-      .catch((error) => {
-        console.error('Error creating Mars:', error);
-      });
+      .then((marsMesh) => { mars = marsMesh; planets.Mars = mars; })
+      .catch((error) => console.error('Error creating Mars:', error));
 
     // Create Jupiter
     createJupiter(textureLoader, scene, addClickableObject, createLabel)
-      .then((jupiterMesh) => {
-        jupiter = jupiterMesh;
-        planets.Jupiter = jupiter;
-      })
-      .catch((error) => {
-        console.error('Error creating Jupiter:', error);
-      });
+      .then((jupiterMesh) => { jupiter = jupiterMesh; planets.Jupiter = jupiter; })
+      .catch((error) => console.error('Error creating Jupiter:', error));
 
     // Create Saturn
     createSaturn(textureLoader, scene, addClickableObject, createLabel)
-      .then((saturnMesh) => {
-        saturn = saturnMesh;
-        planets.Saturn = saturn;
-      })
-      .catch((error) => {
-        console.error('Error creating Saturn:', error);
-      });
+      .then((saturnMesh) => { saturn = saturnMesh; planets.Saturn = saturn; })
+      .catch((error) => console.error('Error creating Saturn:', error));
 
     // Create Uranus
     createUranus(textureLoader, scene, addClickableObject, createLabel)
-      .then((uranusMesh) => {
-        uranus = uranusMesh;
-        planets.Uranus = uranus;
-      })
-      .catch((error) => {
-        console.error('Error creating Uranus:', error);
-      });
+      .then((uranusMesh) => { uranus = uranusMesh; planets.Uranus = uranus; })
+      .catch((error) => console.error('Error creating Uranus:', error));
 
     // Create Neptune
     createNeptune(textureLoader, scene, addClickableObject, createLabel)
-      .then((neptuneMesh) => {
-        neptune = neptuneMesh;
-        planets.Neptune = neptune;
-      })
-      .catch((error) => {
-        console.error('Error creating Neptune:', error);
-      });
+      .then((neptuneMesh) => { neptune = neptuneMesh; planets.Neptune = neptune; })
+      .catch((error) => console.error('Error creating Neptune:', error));
 
     // ===============================
     // ANIMATION LOOP
@@ -1057,7 +1114,10 @@ export default function NASAOceanVR() {
     function animate() {
       requestAnimationFrame(animate);
       
-      // Update labels to face camera
+      // Only use orbit controls
+      controls.update();
+      
+      // Update labels
       updateLabels();
       
       // Rotate Sun
@@ -1065,7 +1125,7 @@ export default function NASAOceanVR() {
         planets.Sun.rotation.y += planets.Sun.userData.rotationSpeed;
       }
       
-      // Animate all modular planets
+      // Animate all planets
       if (earth) animateEarth(earth);
       if (moon) animateMoon(moon);
       if (mercury) animateMercury(mercury);
@@ -1086,9 +1146,6 @@ export default function NASAOceanVR() {
         particles.rotation.y += 0.0002;
       }
       
-      // Update controls
-      controls.update();
-      
       // Render scene
       renderer.render(scene, camera);
     }
@@ -1096,30 +1153,23 @@ export default function NASAOceanVR() {
     animate();
     
     // ===============================
-    // WINDOW RESIZE HANDLER
-    // ===============================
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    
-    // ===============================
-    // CLEANUP
+    // CLEANUP - UPDATED
     // ===============================
     return () => {
+      // document.removeEventListener('keydown', handleKeyDown, true);
+      // document.removeEventListener('keyup', handleKeyUp, true);
+      // document.removeEventListener('pointerlockchange', handlePointerLockChange);
       window.removeEventListener('resize', handleResize);
       renderer.domElement.removeEventListener('click', handleClick);
       renderer.domElement.removeEventListener('mousemove', handleMouseMove);
-      document.body.style.cursor = 'default'; // Reset cursor
+      document.body.style.cursor = 'default';
       
-      // Remove glow effect from any currently hovered object
-      if (hoveredObject) {
-        removeGlowEffect(hoveredObject);
+      if (hoveredObject) removeGlowEffect(hoveredObject);
+      if (document.pointerLockElement === renderer.domElement) {
+        document.exitPointerLock();
       }
-      
+      if (controls) controls.dispose();
+      if (fpControls) fpControls.dispose();
       if (containerRef.current && renderer.domElement) {
         containerRef.current.removeChild(renderer.domElement);
       }
@@ -1127,6 +1177,13 @@ export default function NASAOceanVR() {
     };
   }, []);
   
+  useEffect(() => {
+    zoomModeRef.current = zoomMode;
+  }, [zoomMode]);
+
+  useEffect(() => {
+    targetObjectRef.current = targetObject;
+  }, [targetObject]);
   
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
@@ -1166,8 +1223,7 @@ export default function NASAOceanVR() {
         </div>
       )}
       
-      {/* REMOVED: Selected Object Overlay */}
-      
+      {/* Top info panel */}
       <div style={{
         position: 'absolute',
         top: '10px',
@@ -1178,32 +1234,46 @@ export default function NASAOceanVR() {
         borderRadius: '5px',
         fontFamily: 'Arial, sans-serif',
         fontSize: '14px',
-        maxWidth: '300px'
+        maxWidth: '300px',
+        pointerEvents: 'none',
+        zIndex: 10 // Add this line
       }}>
         <strong>{zoomMode ? `Zoomed: ${targetObject?.userData?.name || 'Object'}` : 'Solar System Explorer'}:</strong><br/>
         🖱️ Mouse: Look around (rotate view)<br/>
         🔄 Mouse wheel: Zoom in/out<br/>
         🖱️ Click: Zoom into planets/objects<br/>
         💫 Hover: Objects glow when selectable<br/>
-        
       </div>
       
-      <div style={{
-        position: 'absolute',
-        bottom: '10px',
-        left: '10px',
-        color: 'white',
-        background: 'rgba(0,0,0,0.7)',
-        padding: '10px',
-        borderRadius: '5px',
-        fontFamily: 'Arial, sans-serif',
-        fontSize: '12px',
-        maxWidth: '250px'
-      }}>
+      {/* Credits button */}
+      <div 
+        onClick={() => setShowAbout(true)}
+        style={{
+          position: 'absolute',
+          bottom: '10px',
+          left: '10px',
+          color: 'white',
+          background: 'rgba(0,0,0,0.7)',
+          padding: '10px',
+          borderRadius: '5px',
+          fontFamily: 'Arial, sans-serif',
+          fontSize: '12px',
+          maxWidth: '250px',
+          cursor: 'pointer',
+          transition: 'background-color 0.2s',
+          border: '1px solid rgba(100, 150, 255, 0.3)',
+          zIndex: 10 // Add this line
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(20,20,50,0.8)'}
+        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.7)'}
+      >
         <strong>CIDAK Credits</strong><br/>
-        Add about us section 2025<br/>
+        <span style={{ fontSize: '10px', opacity: 0.8 }}>Click for team info</span>
       </div>
-      {/* User Input and AI Response Section with Astronaut Scene */}
+      
+      <AboutDialog isOpen={showAbout} onClose={() => setShowAbout(false)} />
+      
+      {/* Bottom info panel */}
       <div style={{
         position: 'absolute',
         bottom: '10px',
@@ -1216,8 +1286,10 @@ export default function NASAOceanVR() {
         fontSize: '12px',
         maxWidth: '400px',
         width: '380px',
-        height: selectedObject ? '400px' : '10px',
-        border: '2px solid rgba(255,255,255,0.1)'
+        height: selectedObject ? '400px' : '100px',
+        border: '2px solid rgba(255,255,255,0.1)',
+        transition: 'height 0.3s ease-in-out',
+        zIndex: 10 // Add this line
       }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
           <div style={{ flex: 1 }}>
@@ -1381,13 +1453,21 @@ export default function NASAOceanVR() {
           background: 'rgba(255,255,255,0.05)',
           color: 'white',
           fontSize: '10px',
-          height: '120px',
+          height: selectedObject ? '120px' : '60px',
           overflowY: 'auto',
-          border: '1px solid rgba(255,255,255,0.1)'
+          border: '1px solid rgba(255,255,255,0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}>
           {selectedObject 
             ? "Select an object and ask a question to chat with the astronaut!" 
-            : "Click on any celestial object first to start a conversation!"
+            : (
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ marginBottom: '5px', fontSize: '16px' }}>👆</div>
+                Click on any planet or object in the solar system to begin exploring
+              </div>
+            )
           }
         </div>
         
@@ -1412,6 +1492,4 @@ export default function NASAOceanVR() {
       </div>
     </div>
   );
-  
-  
 }
