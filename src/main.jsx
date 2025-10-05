@@ -865,28 +865,61 @@ export default function NASAOceanVR() {
       animate();
     }
 
-    function handleObjectClick(intersectedObject) {
-      let targetObj = intersectedObject;
+    // function handleObjectClick(intersectedObject) {
+    //   let targetObj = intersectedObject;
 
-      clickableObjects.forEach((clickableObj) => {
-        if (
-          clickableObj.children.includes(intersectedObject) ||
-          clickableObj === intersectedObject
-        ) {
-          targetObj = clickableObj;
-        }
-      });
+    //   clickableObjects.forEach((clickableObj) => {
+    //     if (
+    //       clickableObj.children.includes(intersectedObject) ||
+    //       clickableObj === intersectedObject
+    //     ) {
+    //       targetObj = clickableObj;
+    //     }
+    //   });
+
+    //   console.log('Clicked object:', targetObj.userData?.name || 'Unknown');
+    //   setSelectedObject(targetObj.userData?.name || 'Unknown Object');
+    //   zoomIntoObject(targetObj);
+
+    //   // Custom click handlers for specific objects
+    //   if (targetObj.userData?.name === 'Earth') {
+    //     restoreEarthTexture(earth);
+    //   }
+
+    //   if (
+    //     targetObj.userData?.name.startsWith('Object_') &&
+    //     selectedObject === 'Earth'
+    //   ) {
+    //     changeEarthTexture(
+    //       earth,
+    //       '/assets/imgs/ecco2_and_grid_web.png',
+    //       textureLoader,
+    //     );
+    //   }
+    // }
+
+    function handleObjectClick(intersectedObject) {
+      // Walk up the parent chain until we find something in clickableObjects
+      let targetObj = intersectedObject;
+      while (targetObj && !clickableObjects.includes(targetObj)) {
+        targetObj = targetObj.parent;
+      }
+
+      if (!targetObj) return;
 
       console.log('Clicked object:', targetObj.userData?.name || 'Unknown');
       setSelectedObject(targetObj.userData?.name || 'Unknown Object');
       zoomIntoObject(targetObj);
 
-      // Custom click handlers for specific objects
+      // Custom handlers
       if (targetObj.userData?.name === 'Earth') {
         restoreEarthTexture(earth);
       }
 
-      if (targetObj.userData?.name.startsWith('Object_')) {
+      if (
+        targetObj.userData?.name.startsWith('Object_') &&
+        selectedObject === 'Earth'
+      ) {
         changeEarthTexture(
           earth,
           '/assets/imgs/ecco2_and_grid_web.png',
