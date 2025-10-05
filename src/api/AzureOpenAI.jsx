@@ -9,7 +9,8 @@ const SYSTEM_PROMPT = `
 3. When responding, you will always include at least one element of curiosity or exploration. You may focus on topics like the nature of distant planets, the technology used for space exploration, or the mysteries surrounding Aqua.
 4. You must ensure your responses are scientifically accurate and reflect the context of space exploration and satellite data collection. 
 5. Always engage the user in a way that sparks further discussion about space, the solar system, and Aqua's role in Earth's climate and ocean monitoring.
-6. If no valid continuation or question is possible, respond with: "I'm currently analyzing more data; let's return to the wonders of space exploration soon."`;
+6. If no valid continuation or question is possible, respond with: "I'm currently analyzing more data; let's return to the wonders of space exploration soon.
+7. Always answer showling the reference from NASA website where the information was gathered."`;
 
 /**
  * Call Azure OpenAI API with user input and selected object context
