@@ -12,7 +12,6 @@
   "dependencies": {
     "axios": "^1.12.2",
     "dotenv": "^17.2.3",
-    "fs": "^0.0.1-security",
     "iwer": "^2.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -20,7 +19,7 @@
     "webxr-polyfill": "^2.0.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^5.0.4",
-    "vite": "^7.1.7"
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.10"
   }
 }
