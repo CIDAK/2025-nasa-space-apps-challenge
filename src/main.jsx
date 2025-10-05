@@ -5,7 +5,7 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 import { XRDevice, metaQuest3 } from 'iwer';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { callAzureOpenAI, updateResponseDiv } from './api/AzureOpenAI.jsx';
-import { createEarth, changeEarthTexture, restoreEarthTexture, animateEarth, EARTH_CONFIG } from './planets/earth.jsx';
+import { createEarth, changeEarthTexture, restoreEarthTexture, animateEarth, EARTH_CONFIG } from './planets/earth/Earth.jsx';
 import { createMoon, animateMoon, MOON_CONFIG } from './moon/Moon.jsx';
 import { createJupiter, animateJupiter, JUPITER_CONFIG } from './planets/Jupiter.jsx';
 import { createVenus, animateVenus, VENUS_CONFIG } from './planets/Venus.jsx';
@@ -28,6 +28,15 @@ export default function NASAOceanVR() {
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [earthView, setEarthView] = useState('standard');
+  const [earthViewOptions, setEarthViewOptions] = useState([
+    { id: 'standard', name: 'Standard View', icon: '🌍' },
+    { id: 'temperature', name: 'Ocean Temperature', icon: '🌡️' },
+    { id: 'anomaly', name: 'Temperature Anomalies', icon: '🔥' },
+    { id: 'day-night', name: 'Day/Night View', icon: '🌓' },
+    { id: 'real-scale', name: '1:1 Scale View', icon: '🛰️' }
+  ]);
+  const earthViewRestoreRef = useRef(null);
   
   // Add refs to track current state for event handlers
   const zoomModeRef = useRef(false);
@@ -1185,6 +1194,29 @@ export default function NASAOceanVR() {
     targetObjectRef.current = targetObject;
   }, [targetObject]);
   
+  // Add this function to handle earth view changes
+  function changeEarthView(view) {
+    // First restore if needed
+    if (earthViewRestoreRef.current && earthView === 'real-scale') {
+      earthViewRestoreRef.current();
+      earthViewRestoreRef.current = null;
+    }
+    
+    if (view === 'real-scale') {
+      // 1:1 scale view
+      const restoreFunc = viewEarthFromSpace(earth, camera, controls);
+      earthViewRestoreRef.current = restoreFunc.restore;
+    } else if (view === 'standard') {
+      // Standard view
+      restoreEarthTexture(earth);
+    } else {
+      // Temperature visualization modes
+      showOceanTemperature(earth, textureLoader, view);
+    }
+    
+    setEarthView(view);
+  }
+  
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
@@ -1384,6 +1416,84 @@ export default function NASAOceanVR() {
                 {AQUA_SAT_CONFIG.info.emoji} {AQUA_SAT_CONFIG.info.description}
               </div>
             )}
+          </div>
+        )}
+        
+        {selectedObject === 'Earth' && (
+          <div style={{ 
+            marginBottom: '10px',
+            padding: '5px',
+            backgroundColor: 'rgba(0,100,200,0.15)',
+            borderRadius: '5px',
+            border: '1px solid rgba(100,150,255,0.2)'
+          }}>
+            <div style={{ marginBottom: '6px', fontSize: '11px', fontWeight: 'bold', textAlign: 'center' }}>
+              Earth View Options
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <button
+                onClick={() => changeEarthView('standard')}
+                style={{
+                  flex: 1,
+                  padding: '6px 4px',
+                  backgroundColor: earthView === 'standard' ? 'rgba(0,100,200,0.6)' : 'rgba(50,50,50,0.5)',
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: 'white',
+                  margin: '0 2px',
+                  cursor: 'pointer',
+                  fontSize: '10px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                <span style={{ fontSize: '14px', marginBottom: '2px' }}>🌍</span>
+                <span>Normal</span>
+              </button>
+              
+              <button
+                onClick={() => changeEarthView('temperature')}
+                style={{
+                  flex: 1,
+                  padding: '6px 4px',
+                  backgroundColor: earthView === 'temperature' ? 'rgba(0,100,200,0.6)' : 'rgba(50,50,50,0.5)',
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: 'white',
+                  margin: '0 2px',
+                  cursor: 'pointer',
+                  fontSize: '10px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                <span style={{ fontSize: '14px', marginBottom: '2px' }}>🌡️</span>
+                <span>Ocean Temp</span>
+              </button>
+              
+              <button
+                onClick={() => changeEarthView('real-scale')}
+                style={{
+                  flex: 1,
+                  padding: '6px 4px',
+                  backgroundColor: earthView === 'real-scale' ? 'rgba(0,100,200,0.6)' : 'rgba(50,50,50,0.5)',
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: 'white',
+                  margin: '0 2px',
+                  cursor: 'pointer',
+                  fontSize: '10px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                <span style={{ fontSize: '14px', marginBottom: '2px' }}>🛰️</span>
+                <span>1:1 Scale</span>
+              </button>
+            </div>
           </div>
         )}
         
